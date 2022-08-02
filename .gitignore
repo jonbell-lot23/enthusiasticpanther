@@ -7,6 +7,9 @@
 /.next/
 .next/
 .out/
+out/
+.nova/
+.gitignore
 
 # testing
 /coverage
@@ -25,3 +28,5 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+.gitignore

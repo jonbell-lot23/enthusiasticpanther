@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build; next export",
-    "deploy": "next build && next export && rsync -avz --delete out/ uxlaunch@uxlaunchpad.com:/home4/uxlaunch/www/enthusiasticpanther",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
