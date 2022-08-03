@@ -64,7 +64,7 @@ export default function Home() {
          </Link> </li> 
         <li>
         <Link href="shows/">
-           <a className="bg-blue-900 text-white">recent shows</a>
+           <a className="text-white bg-blue-900">recent shows</a>
          </Link>         
         </li>
         </ul>
