@@ -8,9 +8,9 @@ import { useRouter } from "next/router";
 function Song(props) {
   return (   
     <>
-    <div className="flex bg-red-100 w-96">
-      <div>{props.name}</div>
-      <div className="justify-end flex-end">{props.quality}</div>
+    <div className="w-96 columns-2">
+      <div className="w-96">{props.name}</div>
+      <div className="text-right">{props.quality}</div>
     </div>
     </>
   );

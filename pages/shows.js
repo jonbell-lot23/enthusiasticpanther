@@ -40,9 +40,13 @@ export default function Home() {
         "item-container rounded-md mr-4 ml-0 text-red-400 p-1 pl-0 float-left";
       var bgcolor2 = "bg-red-400";
     }
+
+    const showid = "show/"+props.showid;
+
+
     return (
       
-        <div>{props.avg > 0 ? <div className={bgcolor}><div>{props.name}</div></div> : ''}</div>
+        <div>{props.avg > 0 ? <Link href={showid}><div className={bgcolor}><div className="cursor-pointer hover:bg-gray-100">{props.location}</div></div></Link> : ''}</div>
       
     );
   }
@@ -78,7 +82,7 @@ export default function Home() {
 
           {shows &&
             shows.map((show) => (
-              <Show name={show.location} avg={Number(show.avg).toFixed()} />
+              <Show location={show.location} avg={Number(show.avg).toFixed()} showid={show.showid} />
             ))}
         </div>
       </main>
