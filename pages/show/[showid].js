@@ -2,10 +2,11 @@ import Head from "next/head";
 import styles from "../../styles/Home.module.css";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Confetti from "/pages/confetti.js";
 import { useRouter } from "next/router";
 
-
 function Song(props) {
+
   return (   
     <>
     <div className="w-96 columns-2">
@@ -16,10 +17,34 @@ function Song(props) {
   );
 }
 
+function callConfetti()
+{
+ //  const [showConfetti, setShowConfetti] = React.useState(false);  
+  
+  console.log("CALLED IT");
+  return (  
+    <Confetti />  
+  )
+}
+
+function Example(props) {
+  // Declare a new state variable, which we'll call "count"
+  const [count, setCount] = useState(0);
+  return (
+   <div>
+    <p>You clicked {count} times</p><br /><br />
+     <button onClick={() => setCount(count + 1)}>
+        Click me
+       </button>
+       {count == 0 ? "butt" : <Confetti /> }
+      </div>      
+      );
+}
+
 function Page({ data }) {
   
   console.log("loading...");
-  console.log(data);
+  // console.log(data);
 
   // Render data...
   return (
@@ -49,11 +74,15 @@ function Page({ data }) {
         
 
         <div className="app">
+          
           {data &&
             data.map((song) => (
               <Song name={song.name} quality={song.quality} />
             ))}
         </div>
+
+        <button className="mt-4" onClick={callConfetti}>Call confetti</button>
+        <Example />
       </main>
       
       </div>

@@ -1,0 +1,22 @@
+.App {
+  font-family: Inter, sans-serif;
+  text-align: center;
+  height: 100%;
+}
+
+.confetti-wrap {
+  background: #4919db;
+  padding: 20px;
+}
+
+.confetti-wrap h3 {
+  margin: 0;
+  color: #fff;
+  letter-spacing: 1.5px;
+}
+
+.text {
+  font-size: 90px;
+  margin-top: 300px;
+  font-weight: black;
+}
