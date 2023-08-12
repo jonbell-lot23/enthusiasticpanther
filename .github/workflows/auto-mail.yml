@@ -1,9 +1,8 @@
-
 name: Send auto-email
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0 17 * * *' # 5:00 PM UTC, corresponding to 5:00 AM next day NZST (UTC+12)
   workflow_dispatch:
 
 jobs:
