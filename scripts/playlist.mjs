@@ -1,8 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { Resend } from "resend";
 
 const prisma = new PrismaClient();
-const resend = new Resend("re_7nsaGUMW_KVKi5vMNmwXgFWxS7QftNfph");
 
 async function getRandomSongs() {
   // Get the total count of songs with bandid = 1
@@ -37,31 +35,12 @@ async function getRandomSongs() {
   return randomSongs;
 }
 
-async function sendPlaylistByEmail(songs) {
-  const playlistHTML = songs.map((song) => `<li>${song.name}</li>`).join("");
-
-  return resend.emails.send({
-    from: "onboarding@resend.dev",
-    to: "github@lot23.com",
-    subject: "🎸 EP email",
-    html: `<p>This is an automated message from Enthusiastic Panther</p><ul>${playlistHTML}</ul>`,
-  });
-}
-
 async function main() {
   const songs = await getRandomSongs();
   console.log("Playlist:");
   songs.forEach((song) => {
     console.log(`* ${song.name}`);
   });
-
-  try {
-    await sendPlaylistByEmail(songs);
-    console.log("Playlist email sent successfully!");
-  } catch (err) {
-    console.error("An error occurred:", err);
-    process.exit(1);
-  }
 }
 
 main()
