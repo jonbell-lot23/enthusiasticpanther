@@ -9,6 +9,10 @@ jobs:
   run-script:
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }} # Assuming you've set DATABASE_URL as a secret in your GitHub repository
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }} # If you have an API key for Resend, you can add it as a secret
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -18,8 +22,8 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Install resend package
-      run: npm install resend
+    - name: Install dependencies
+      run: npm install
 
     - name: Run script
       run: node scripts/mail.mjs
