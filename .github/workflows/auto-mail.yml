@@ -23,4 +23,4 @@ jobs:
       run: npm install resend
 
     - name: Run script
-      run: node /scripts/mail.mjs
+      run: node scripts/mail.mjs
