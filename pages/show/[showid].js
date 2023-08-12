@@ -2,97 +2,61 @@ import Head from "next/head";
 import styles from "../../styles/Home.module.css";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Confetti from "/pages/confetti.js";
 import { useRouter } from "next/router";
 
 function Song(props) {
-
-  return (   
+  return (
     <>
-    <div className="w-96 columns-2">
-      <div className="w-96">{props.name}</div>
-      <div className="text-right">{props.quality}</div>
-    </div>
+      <div className="w-96 columns-2">
+        <div className="w-96">{props.name}</div>
+        <div className="text-right">{props.quality}</div>
+      </div>
     </>
   );
 }
 
-function callConfetti()
-{
- //  const [showConfetti, setShowConfetti] = React.useState(false);  
-  
-  console.log("CALLED IT");
-  return (  
-    <Confetti />  
-  )
-}
-
-function Example(props) {
-  // Declare a new state variable, which we'll call "count"
-  const [count, setCount] = useState(0);
-  return (
-   <div>
-    <p>You clicked {count} times</p><br /><br />
-     <button onClick={() => setCount(count + 1)}>
-        Click me
-       </button>
-       {count == 0 ? "butt" : <Confetti /> }
-      </div>      
-      );
-}
-
 function Page({ data }) {
-  
   console.log("loading...");
   // console.log(data);
 
   // Render data...
   return (
     <div className={styles.container}>
-    
-    <div className="container">
-      <Head>
-        <title>Enthusiastic Panther Shows</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <div className="container">
+        <Head>
+          <title>Enthusiastic Shows</title>
+          <link rel="icon" href="/favicon.ico" />
+        </Head>
 
-      <header>enthusiastic panther, your favourite made-up band from New Zealand</header>                                    
-      <div className="my-4">
-        <ul>
-        <li><Link href="songs/">
-           <a>list of songs</a>
-         </Link> </li> 
-        <li>
-        <Link href="shows/">
-           <a className="text-white bg-blue-900">recent shows</a>
-         </Link>         
-        </li>
-        </ul>
-      </div>
-      
-      <main className="mb-12">
-        
-
-        <div className="app">
-          
-          {data &&
-            data.map((song) => (
-              <Song name={song.name} quality={song.quality} />
-            ))}
+        <header>
+          Enthusiastic Panther, your favourite made-up band from New Zealand
+        </header>
+        <div className="my-4">
+          <ul>
+            <li>
+              <Link href="songs/">
+                <a>list of songs</a>
+              </Link>{" "}
+            </li>
+            <li>
+              <Link href="shows/">
+                <a className="text-white bg-blue-900">recent shows</a>
+              </Link>
+            </li>
+          </ul>
         </div>
 
-        <button className="mt-4" onClick={callConfetti}>Call confetti</button>
-        <Example />
-      </main>
-      
+        <main className="mb-12">
+          <div className="app">
+            {data &&
+              data.map((song) => (
+                <Song name={song.name} quality={song.quality} />
+              ))}
+          </div>
+        </main>
       </div>
-      
 
       <style jsx>{`
-       
-
-       
-
         .title a {
           color: #0070f3;
           text-decoration: none;
@@ -181,27 +145,23 @@ function Page({ data }) {
         }
       `}</style>
 
-      <style jsx global>{`
-        
-      `}</style>
+      <style jsx global>{``}</style>
     </div>
   );
 }
 
-
 // This gets called on every request
 export async function getServerSideProps(context) {
-  
   console.log(context.query);
-  
-  // Fetch data from external API
-  const res = await fetch(`https://lot23.com/play/enthusiasticpanther/json/show.php?showid=${context.query.showid}`);
-  const data = await res.json()
 
-  
+  // Fetch data from external API
+  const res = await fetch(
+    `https://lot23.com/play/enthusiasticpanther/json/show.php?showid=${context.query.showid}`
+  );
+  const data = await res.json();
 
   // Pass data to the page via props
-  return { props: { data } }
+  return { props: { data } };
 }
 
-export default Page
+export default Page;
