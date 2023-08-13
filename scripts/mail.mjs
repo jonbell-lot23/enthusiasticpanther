@@ -4,6 +4,21 @@ import { Resend } from "resend";
 const prisma = new PrismaClient();
 const resend = new Resend("re_7nsaGUMW_KVKi5vMNmwXgFWxS7QftNfph");
 
+async function calculateHistoricalQuality(songId) {
+  const performances = await prisma.ep_songperformances.findMany({
+    where: { songid: songId },
+  });
+
+  const totalQuality = performances.reduce(
+    (sum, performance) => sum + Number(performance.quality),
+    0
+  );
+
+  const averageQuality = totalQuality / performances.length;
+
+  return Math.floor(averageQuality);
+}
+
 async function getRandomSongs() {
   // Get the total count of songs with bandid = 1
   const totalSongs = await prisma.ep_songs.count({
@@ -28,6 +43,10 @@ async function getRandomSongs() {
 
     // Ensure that the song is unique
     if (!randomSongs.some((song) => song.id === randomSong.id)) {
+      // Add historical quality to the song
+      randomSong.historicalQuality = await calculateHistoricalQuality(
+        randomSong.id
+      );
       randomSongs.push(randomSong);
     } else {
       i--; // Decrement counter to try again
@@ -38,7 +57,9 @@ async function getRandomSongs() {
 }
 
 async function sendPlaylistByEmail(songs) {
-  const playlistHTML = songs.map((song) => `<li>${song.name}</li>`).join("");
+  const playlistHTML = songs
+    .map((song) => `<li>${song.name} (${song.historicalQuality})</li>`)
+    .join("");
 
   return resend.emails.send({
     from: "onboarding@resend.dev",
@@ -50,10 +71,16 @@ async function sendPlaylistByEmail(songs) {
 
 async function main() {
   const songs = await getRandomSongs();
+  let totalPerformanceScore = 0;
+
   console.log("Playlist:");
   songs.forEach((song) => {
-    console.log(`* ${song.name}`);
+    console.log(`* ${song.name} (${song.historicalQuality})`);
+    totalPerformanceScore += song.historicalQuality;
   });
+
+  const averagePerformanceScore = totalPerformanceScore / songs.length;
+  console.log(`\nAverage Performance Score: ${averagePerformanceScore}`);
 
   try {
     await sendPlaylistByEmail(songs);

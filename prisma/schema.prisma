@@ -94,6 +94,13 @@ model ep_songs {
   weighting         Int?
 }
 
+model ep_songperformances {
+  id      BigInt @id
+  showid  Int?
+  songid  Int?
+  quality Int?
+}
+
 enum Rating {
   Like
   DidNotLike
