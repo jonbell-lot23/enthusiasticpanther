@@ -70,7 +70,10 @@ async function getRandomSongs() {
 
 async function sendPlaylistByEmail(songs) {
   const playlistHTML = songs
-    .map((song) => `<li>${song.name} (${song.historicalQuality})</li>`)
+    .map(
+      (song) =>
+        `<li>${song.name} (${song.historicalQuality}% Gap: ${song.gap})</li>`
+    )
     .join("");
 
   return resend.emails.send({
