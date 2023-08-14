@@ -20,37 +20,49 @@ async function calculateHistoricalQuality(songId) {
 }
 
 async function getRandomSongs() {
-  // Get the total count of songs with bandid = 1
-  const totalSongs = await prisma.ep_songs.count({
-    where: { bandid: 1 },
+  // Store the random songs
+  const randomSongs = [];
+
+  // Get the latest concert ID
+  const latestConcert = await prisma.ep_shows.findFirst({
+    orderBy: { id: "desc" },
   });
+  if (!latestConcert) return randomSongs;
 
   // Determine the number of songs to fetch (between 11 and 15)
   const numberOfSongs = Math.floor(Math.random() * 5) + 11;
 
-  // Store the random songs
-  const randomSongs = [];
+  // Fetch songs with bandid = 1 and weighting != 0
+  const songs = await prisma.ep_songs.findMany({
+    where: { bandid: 1, weighting: { not: 0 } },
+  });
 
-  for (let i = 0; i < numberOfSongs; i++) {
-    // Generate a random index
-    const randomIndex = Math.floor(Math.random() * totalSongs);
+  // Shuffle the songs
+  const shuffledSongs = songs.sort(() => 0.5 - Math.random());
 
-    // Fetch a random song with bandid = 1 using the "skip" argument
-    const randomSong = await prisma.ep_songs.findFirst({
-      skip: randomIndex,
-      where: { bandid: 1 },
+  for (const song of shuffledSongs) {
+    if (randomSongs.length >= numberOfSongs) break;
+
+    // Calculate the gap
+    const latestPerformance = await prisma.ep_songperformances.findFirst({
+      where: { songid: song.id },
+      orderBy: { id: "desc" },
     });
 
+    if (!latestPerformance) continue;
+
+    const gap = BigInt(latestConcert.id) - BigInt(latestPerformance.showid);
+
+    // Ensure the gap is at least 4
+    if (gap < 4) continue;
+
     // Ensure that the song is unique
-    if (!randomSongs.some((song) => song.id === randomSong.id)) {
-      // Add historical quality to the song
-      randomSong.historicalQuality = await calculateHistoricalQuality(
-        randomSong.id
-      );
-      randomSongs.push(randomSong);
-    } else {
-      i--; // Decrement counter to try again
-    }
+    if (randomSongs.some((rSong) => rSong.id === song.id)) continue;
+
+    // Add historical quality and gap to the song
+    song.historicalQuality = await calculateHistoricalQuality(song.id);
+    song.gap = gap; // Add the gap to the song object
+    randomSongs.push(song);
   }
 
   return randomSongs;
@@ -75,7 +87,7 @@ async function main() {
 
   console.log("Playlist:");
   songs.forEach((song) => {
-    console.log(`* ${song.name} (${song.historicalQuality})`);
+    console.log(`* ${song.name} (${song.historicalQuality}% Gap: ${song.gap})`);
     totalPerformanceScore += song.historicalQuality;
   });
 

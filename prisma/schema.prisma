@@ -101,6 +101,14 @@ model ep_songperformances {
   quality Int?
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model ep_shows {
+  id       BigInt  @id
+  date     String?
+  location String?
+  quality  Int?    @db.SmallInt
+}
+
 enum Rating {
   Like
   DidNotLike
