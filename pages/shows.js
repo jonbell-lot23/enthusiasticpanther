@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import styles from "../styles/Home.module.css";
 import { PrismaClient } from "@prisma/client";
+import React, { useEffect, useState } from "react";
 
 function Show(props) {
   let bgcolor;
@@ -21,12 +22,28 @@ function Show(props) {
 
   const showid = "show/" + props.showid;
 
+  const [imageExists, setImageExists] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/checkImage?showId=${props.showid}`)
+      .then((res) => res.json())
+      .then((data) => setImageExists(data.exists));
+  }, [props.showid]);
+
   return (
     <div>
       <Link href={showid}>
         <div className={bgcolor}>
-          <div className="cursor-pointer hover:bg-gray-100">
-            {props.location}
+          <div className="w-48 cursor-pointer hover:bg-gray-100">
+            <img
+              src={
+                imageExists === true
+                  ? `/show-art/show${props.showid}.png`
+                  : `/show-art/placeholder.png`
+              }
+              alt={props.location}
+            />
+            <div className="text-xs text-gray-400">{props.location}</div>
           </div>
         </div>
       </Link>
