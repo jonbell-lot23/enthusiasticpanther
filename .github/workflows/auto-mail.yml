@@ -27,3 +27,6 @@ jobs:
 
     - name: Run script
       run: node scripts/mail.mjs
+      env:
+        OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+    
