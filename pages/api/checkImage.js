@@ -6,12 +6,15 @@ export default function handler(req, res) {
   const imagePath = path.join(
     process.cwd(),
     "public",
-    `show-art/show${showId}.png`
+    "show-art",
+    `show${showId}.png`
   );
 
-  if (fs.existsSync(imagePath)) {
-    res.status(200).json({ exists: true });
-  } else {
-    res.status(200).json({ exists: false });
-  }
+  fs.access(imagePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      res.status(200).json({ exists: false });
+    } else {
+      res.status(200).json({ exists: true });
+    }
+  });
 }
