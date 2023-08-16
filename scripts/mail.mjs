@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Resend } from "resend";
+import fetch from "node-fetch";
 
 const prisma = new PrismaClient();
 const resend = new Resend("re_7nsaGUMW_KVKi5vMNmwXgFWxS7QftNfph");
@@ -19,30 +20,94 @@ async function calculateHistoricalQuality(songId) {
   return Math.floor(averageQuality);
 }
 
-async function createNewShow(location = "Wellington, NZ") {
-  // Fetch the latest show ID
-  const latestShow = await prisma.ep_shows.findFirst({
-    orderBy: { id: "desc" },
-  });
-
-  // Increment the latest show ID by one to create a new unique ID
-  const newShowId = latestShow ? Number(latestShow.id) + 1 : 1;
-
-  // Get the current date and format it as YYYY-MM-DD
-  const currentDate = new Date();
-  const formattedDate = `${currentDate.getFullYear()}-${String(
-    currentDate.getMonth() + 1
-  ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
-
-  // Create the new show with the generated ID and formatted date
-  return await prisma.ep_shows.create({
-    data: {
-      id: newShowId,
-      location: location,
-      quality: 100,
-      date: formattedDate, // Assuming the field name is 'date' in the database
+async function getPastConcerts(prisma) {
+  console.log(`Fetching past concerts`);
+  const result = await prisma.ep_shows.findMany({
+    orderBy: {
+      date: "desc",
+    },
+    select: {
+      location: true,
+      date: true,
     },
   });
+  console.log(`Finished fetching past concerts`);
+  return result
+    .map((concert) => `${concert.location}, ${concert.date}`)
+    .join("; ");
+}
+
+async function getTranslation(summaryText) {
+  const instructions =
+    "You are a helpful assistant that helps the band decide where to go next on a tour. Pick cities that are a reasonable distance from the previous show and that I haven't been to recently. Big cities are usually better. Only ever respond with a city and country. Nothing else.";
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: instructions },
+        { role: "user", content: summaryText },
+      ],
+      max_tokens: 60,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (
+    !data.choices ||
+    !data.choices[0].message ||
+    !data.choices[0].message.content
+  ) {
+    console.error("Unexpected response from OpenAI API:", data);
+    throw new Error("Unexpected response from OpenAI API");
+  }
+
+  return data.choices[0].message.content.trim();
+}
+
+async function createNewShow() {
+  const prisma = new PrismaClient();
+
+  try {
+    // Fetch past concerts
+    const pastConcertsList = await getPastConcerts(prisma);
+
+    // Query for the next city
+    const nextCityQuery = `These are the venues I've traveled to so far. Please suggest the next city for the tour in the format <City>, <Country>. For example, San Diego, USA. ${pastConcertsList}`;
+    const nextCity = await getTranslation(nextCityQuery);
+
+    // Get the maximum existing ID
+    const maxId = await prisma.ep_shows.findFirst({
+      orderBy: {
+        id: "desc",
+      },
+      select: {
+        id: true,
+      },
+    });
+    const newId = (maxId ? maxId.id : 0) + 1;
+
+    // Insert the new show using the next city
+    console.log(`Creating new show in: ${nextCity}`);
+    const result = await prisma.ep_shows.create({
+      data: {
+        id: newId,
+        location: nextCity,
+        // Add other fields as needed
+      },
+    });
+    console.log(`Finished creating new show: ${result.location}`);
+    return result;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 async function addSongsToPerformance(songs, showId) {
@@ -91,14 +156,14 @@ async function getRandomSongs() {
     });
 
     if (!latestPerformance) continue;
-    console.log(
+    /* console.log(
       `Latest performance for song ID ${song.id}:`,
       latestPerformance
-    );
+    );*/
 
-    console.log(
+    /* console.log(
       `Latest performance showid for song ${song.name}: ${latestPerformance.showid}`
-    );
+    ); */
 
     const gap = Number(latestConcert.id) - Number(latestPerformance.showid);
 

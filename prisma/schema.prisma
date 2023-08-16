@@ -106,7 +106,7 @@ model ep_songperformances {
 }
 
 model ep_shows {
-  id       Int     @id
+  id       Int     @id @default(autoincrement())
   date     String?
   location String?
   quality  Int?    @db.SmallInt
