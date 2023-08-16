@@ -19,49 +19,88 @@ async function calculateHistoricalQuality(songId) {
   return Math.floor(averageQuality);
 }
 
-async function getRandomSongs() {
-  // Store the random songs
-  const randomSongs = [];
+async function createNewShow(location = "Wellington, NZ") {
+  // Fetch the latest show ID
+  const latestShow = await prisma.ep_shows.findFirst({
+    orderBy: { id: "desc" },
+  });
 
-  // Get the latest concert ID
+  // Increment the latest show ID by one to create a new unique ID
+  const newShowId = latestShow ? Number(latestShow.id) + 1 : 1;
+
+  // Create the new show with the generated ID
+  return await prisma.ep_shows.create({
+    data: {
+      id: newShowId,
+      location: location,
+      quality: 100,
+    },
+  });
+}
+
+async function addSongsToPerformance(songs, showId) {
+  for (const song of songs) {
+    // Fetch the latest song performance ID
+    const latestPerformance = await prisma.ep_songperformances.findFirst({
+      orderBy: { id: "desc" },
+    });
+
+    // Increment the latest performance ID by one to create a new unique ID
+    const newPerformanceId = latestPerformance
+      ? Number(latestPerformance.id) + 1
+      : 1;
+
+    await prisma.ep_songperformances.create({
+      data: {
+        id: newPerformanceId,
+        showid: showId, // Now showId is an integer
+        songid: song.id,
+        quality: song.historicalQuality,
+      },
+    });
+  }
+}
+
+async function getRandomSongs() {
+  const randomSongs = [];
   const latestConcert = await prisma.ep_shows.findFirst({
     orderBy: { id: "desc" },
   });
   if (!latestConcert) return randomSongs;
 
-  // Determine the number of songs to fetch (between 11 and 15)
   const numberOfSongs = Math.floor(Math.random() * 5) + 11;
-
-  // Fetch songs with bandid = 1 and weighting != 0
   const songs = await prisma.ep_songs.findMany({
-    where: { bandid: 1, weighting: { not: 0 } },
+    where: { weighting: { not: 0 } },
   });
 
-  // Shuffle the songs
   const shuffledSongs = songs.sort(() => 0.5 - Math.random());
 
   for (const song of shuffledSongs) {
     if (randomSongs.length >= numberOfSongs) break;
 
-    // Calculate the gap
     const latestPerformance = await prisma.ep_songperformances.findFirst({
       where: { songid: song.id },
       orderBy: { id: "desc" },
     });
 
     if (!latestPerformance) continue;
+    console.log(
+      `Latest performance for song ID ${song.id}:`,
+      latestPerformance
+    );
 
-    const gap = BigInt(latestConcert.id) - BigInt(latestPerformance.showid);
+    console.log(
+      `Latest performance showid for song ${song.name}: ${latestPerformance.showid}`
+    );
 
-    // Ensure the gap is at least 4
+    const gap = Number(latestConcert.id) - Number(latestPerformance.showid);
+
     if (gap < 4) continue;
 
-    // Ensure that the song is unique
     if (randomSongs.some((rSong) => rSong.id === song.id)) continue;
 
-    // Add historical quality and gap to the song
     song.historicalQuality = await calculateHistoricalQuality(song.id);
-    song.gap = gap; // Add the gap to the song object
+    song.gap = gap;
     randomSongs.push(song);
   }
 
@@ -96,6 +135,12 @@ async function main() {
 
   const averagePerformanceScore = totalPerformanceScore / songs.length;
   console.log(`\nAverage Performance Score: ${averagePerformanceScore}`);
+
+  const newShow = await createNewShow();
+  // console.log(`New show created with ID: ${newShow.id}`);
+
+  await addSongsToPerformance(songs, newShow.id);
+  // console.log("Songs added to performance successfully!");
 
   try {
     await sendPlaylistByEmail(songs);

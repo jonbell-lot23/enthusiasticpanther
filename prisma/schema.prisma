@@ -88,22 +88,25 @@ model cooking {
 
 model ep_songs {
   id                Int     @id
-  bandid            Int?
   name              String?
+  name_phish        String?
+  name_taylorswift  String?
+  name_gratefuldead String?
+  name_pearljam     String?
+  name_radiohead    String?
   standard_duration String?
-  weighting         Int?
+  weighting         Int?    @db.SmallInt
 }
 
 model ep_songperformances {
-  id      BigInt @id
+  id      Int  @id
   showid  Int?
   songid  Int?
   quality Int?
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model ep_shows {
-  id       BigInt  @id
+  id       Int     @id
   date     String?
   location String?
   quality  Int?    @db.SmallInt

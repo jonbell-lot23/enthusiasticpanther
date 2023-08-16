@@ -1,8 +1,7 @@
 import Head from "next/head";
 import styles from "../../styles/Home.module.css";
-import React, { useEffect, useState } from "react";
+import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 function Song(props) {
   return (
@@ -150,17 +149,32 @@ function Page({ data }) {
   );
 }
 
-// This gets called on every request
 export async function getServerSideProps(context) {
-  console.log(context.query);
+  const prisma = new PrismaClient();
+  const showId = Number(context.query.showid);
 
-  // Fetch data from external API
-  const res = await fetch(
-    `https://lot23.com/play/enthusiasticpanther/json/show.php?showid=${context.query.showid}`
+  // Fetch the song performances for the given show ID
+  const performances = await prisma.ep_songperformances.findMany({
+    where: { showid: showId },
+  });
+
+  // Map the performances into the desired format for the page
+  const data = await Promise.all(
+    performances.map(async (performance) => {
+      // Fetch song details for each performance
+      const song = await prisma.ep_songs.findUnique({
+        where: { id: performance.songid },
+      });
+
+      return {
+        name: song.name,
+        quality: performance.quality,
+      };
+    })
   );
-  const data = await res.json();
 
-  // Pass data to the page via props
+  await prisma.$disconnect();
+
   return { props: { data } };
 }
 
