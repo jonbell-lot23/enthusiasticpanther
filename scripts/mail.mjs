@@ -28,12 +28,19 @@ async function createNewShow(location = "Wellington, NZ") {
   // Increment the latest show ID by one to create a new unique ID
   const newShowId = latestShow ? Number(latestShow.id) + 1 : 1;
 
-  // Create the new show with the generated ID
+  // Get the current date and format it as YYYY-MM-DD
+  const currentDate = new Date();
+  const formattedDate = `${currentDate.getFullYear()}-${String(
+    currentDate.getMonth() + 1
+  ).padStart(2, "0")}-${String(currentDate.getDate()).padStart(2, "0")}`;
+
+  // Create the new show with the generated ID and formatted date
   return await prisma.ep_shows.create({
     data: {
       id: newShowId,
       location: location,
       quality: 100,
+      date: formattedDate, // Assuming the field name is 'date' in the database
     },
   });
 }
