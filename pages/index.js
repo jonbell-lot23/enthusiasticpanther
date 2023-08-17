@@ -8,6 +8,7 @@ function Show(props) {
 
   useEffect(() => {
     if (props.id <= 73 || (props.id >= 172 && props.id <= 219)) {
+      console.log(props.id);
       return;
     }
 
@@ -102,7 +103,7 @@ function Show(props) {
     <div className="p-4">
       <Link href={`show/${props.id}`}>
         <div className="bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl">
-          {props.id <= 73 || (props.id >= 211 && props.id <= 219) ? (
+          {props.id <= 73 || (props.id >= 172 && props.id <= 219) ? (
             <img
               src={`/show-art/show${props.id}.png`}
               alt={props.location}
