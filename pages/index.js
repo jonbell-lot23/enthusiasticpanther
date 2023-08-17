@@ -108,10 +108,7 @@ function Show(props) {
           ) : (
             <canvas ref={canvasRef} className="w-full h-40 rounded-t-lg" />
           )}
-          <div className="p-4 text-gray-700">
-            {props.location}
-            <div>{props.date}</div>
-          </div>
+          <div className="p-4 text-xs text-gray-700">{props.location}</div>
         </div>
       </Link>
     </div>
@@ -124,7 +121,7 @@ export default function Home({ latestShows, highlyRatedShows }) {
       <main className="container p-4 mx-auto">
         <section className="mb-12">
           <h2 className="mb-4 text-2xl font-semibold">LATEST SHOWS</h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 md:grid-cols-4">
             {latestShows &&
               latestShows.map((show) => (
                 <Show showid={show.id} {...show} key={show.id} />
