@@ -1,33 +1,113 @@
-import Head from "next/head";
 import Link from "next/link";
 import { PrismaClient } from "@prisma/client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
 function Show(props) {
-  const showid = "show/" + props.showid;
-
-  const [imageExists, setImageExists] = useState(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    fetch(`/api/checkImage?showId=${props.id}`)
-      .then((res) => res.json())
-      .then((data) => setImageExists(data.exists));
-  }, [props.showid]);
+    if (props.id <= 73 || (props.id >= 213 && props.id <= 219)) {
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const displaySize = 400; // Display size
+    const renderSize = 800; // Rendering size
+    const scale = renderSize / displaySize; // Scale factor
+    const bandWidth = 50; // Width of each band
+
+    // Set the canvas display size
+    canvas.width = displaySize;
+    canvas.height = displaySize;
+
+    // Scale the context to match the rendering size
+    ctx.scale(scale, scale);
+
+    // Hash the ID to get a pattern
+    const hash = String(props.id)
+      .split("")
+      .reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0);
+
+    // 25 colors
+    const colors = [
+      "#1E88E5",
+      "#1976D2",
+      "#1565C0",
+      "#0D47A1",
+      "#039BE5",
+      "#0288D1",
+      "#0277BD",
+      "#01579B",
+      "#80DEEA",
+      "#4DD0E1",
+      "#26C6DA",
+      "#00BCD4",
+      "#FFC107",
+      "#FFB300",
+      "#FFA000",
+      "#FF8F00",
+      "#FF6F00",
+      "#FF4081",
+      "#F50057",
+      "#C51162",
+      "#FF80AB",
+      "#FF4081",
+      "#F50057",
+      "#C51162",
+      "#FF80AB",
+    ];
+
+    // Select 4 colors based on the hash
+    const selectedColors = [
+      colors[hash % 25],
+      colors[(hash >> 2) % 95],
+      colors[(hash >> 4) % 25],
+      colors[(hash >> 6) % 25],
+    ];
+
+    // Clear the canvas
+    ctx.clearRect(0, 0, displaySize, displaySize);
+
+    // Pick a random background color from the selected colors
+    const backgroundColor = selectedColors[hash % 4];
+
+    // Fill the background with the random color
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, displaySize, displaySize);
+
+    // Rotate by 90 degrees based on the hash
+    const rotationAngles = [0, 90, 180, 270];
+    const rotation = rotationAngles[hash % 4];
+    ctx.translate(displaySize / 2, displaySize / 2);
+    ctx.rotate((rotation * Math.PI) / 180);
+    ctx.translate(-displaySize / 2, -displaySize / 2);
+
+    // Draw pattern based on the hash
+    for (let i = 0; i < displaySize / bandWidth; i++) {
+      // Skip the background color
+      ctx.fillStyle = selectedColors[(i + 1) % 4];
+      ctx.fillRect(i * bandWidth, 0, bandWidth, displaySize);
+    }
+
+    // Restore the context to its original state
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }, [props.id]);
 
   return (
     <div className="p-4">
-      <Link href={showid}>
+      <Link href={`show/${props.id}`}>
         <div className="bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl">
-          <img
-            src={
-              imageExists === true
-                ? `/show-art/show${props.id}.png`
-                : `/show-art/placeholder.png`
-            }
-            alt={props.location}
-            className="object-cover w-full h-40 rounded-t-lg"
-          />
+          {props.id <= 73 || (props.id >= 213 && props.id <= 219) ? (
+            <img
+              src={`/show-art/show${props.id}.png`}
+              alt={props.location}
+              className="object-cover w-full h-40 rounded-t-lg"
+            />
+          ) : (
+            <canvas ref={canvasRef} className="w-full h-40 rounded-t-lg" />
+          )}
           <div className="p-4 text-gray-700">
             {props.location}
             <div>{props.date}</div>
