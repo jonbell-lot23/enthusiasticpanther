@@ -7,7 +7,7 @@ function Show(props) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (props.id <= 73 || (props.id >= 213 && props.id <= 219)) {
+    if (props.id <= 73 || (props.id >= 172 && props.id <= 219)) {
       return;
     }
 
