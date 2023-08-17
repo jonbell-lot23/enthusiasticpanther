@@ -5,12 +5,11 @@
 html,
 body {
   padding: 0;
-  margin: .5rem;
-  font-family: Menlo, Consolas, "Ubuntu Mono",
-   "Roboto Mono", "DejaVu Sans Mono",
-   monospace;
-    background-color: #efefef;
-    color: #0f084b;
+  margin: 0.5rem;
+  font-family: Menlo, Consolas, "Ubuntu Mono", "Roboto Mono", "DejaVu Sans Mono",
+    monospace;
+  background-color: #efefef;
+  color: #0f084b;
 }
 
 a {
@@ -18,8 +17,7 @@ a {
   text-decoration: none;
 }
 
-a:hover
-{
+a:hover {
   background-color: #0f084b;
   color: #fff;
 }

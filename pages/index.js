@@ -12,6 +12,9 @@ function Show(props) {
     }
 
     const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
     const ctx = canvas.getContext("2d");
     const displaySize = 400; // Display size
     const renderSize = 800; // Rendering size
@@ -99,7 +102,7 @@ function Show(props) {
     <div className="p-4">
       <Link href={`show/${props.id}`}>
         <div className="bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl">
-          {props.id <= 73 || (props.id >= 213 && props.id <= 219) ? (
+          {props.id <= 73 || (props.id >= 211 && props.id <= 219) ? (
             <img
               src={`/show-art/show${props.id}.png`}
               alt={props.location}
@@ -120,7 +123,7 @@ export default function Home({ latestShows, highlyRatedShows }) {
     <div className="min-h-screen bg-gray-100">
       <main className="container p-4 mx-auto">
         <section className="mb-12">
-          <h2 className="mb-4 text-2xl font-semibold">LATEST SHOWS</h2>
+          <h2 className="pl-4 mb-4 text-xl font-semibold ">LATEST SHOWS</h2>
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 md:grid-cols-4">
             {latestShows &&
               latestShows.map((show) => (
@@ -128,8 +131,10 @@ export default function Home({ latestShows, highlyRatedShows }) {
               ))}
           </div>
         </section>
-        <section className="mb-12">
-          <h2 className="mb-4 text-2xl font-semibold">HIGHLY RATED SHOWS</h2>
+        <section className="mx-0 mb-12">
+          <h2 className="pl-4 mb-4 text-xl font-semibold">
+            HIGHLY RATED SHOWS
+          </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
             {highlyRatedShows &&
               highlyRatedShows.map((show) => (
@@ -138,8 +143,6 @@ export default function Home({ latestShows, highlyRatedShows }) {
           </div>
         </section>
       </main>
-
-      {/* ... (rest of the code) */}
     </div>
   );
 }
