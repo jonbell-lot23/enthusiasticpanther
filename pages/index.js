@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PrismaClient } from "@prisma/client";
+import ShowCard from "../components/ShowCard";
 
 import React, { useEffect, useRef } from "react";
 
@@ -128,7 +129,11 @@ export default function Home({ latestShows, highlyRatedShows }) {
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 md:grid-cols-4">
             {latestShows &&
               latestShows.map((show) => (
-                <Show showid={show.id} {...show} key={show.id} />
+                <ShowCard
+                  showId={show.id}
+                  location={show.location}
+                  key={show.id}
+                />
               ))}
           </div>
         </section>

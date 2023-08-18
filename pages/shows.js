@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import styles from "../styles/Home.module.css";
 import { PrismaClient } from "@prisma/client";
+import ShowCard from "../components/ShowCard";
 import React, { useEffect, useState } from "react";
 
 function Show(props) {
@@ -51,46 +52,22 @@ function Show(props) {
   );
 }
 
-function Home({ shows }) {
+export default function Home({ shows }) {
   return (
     <div className={styles.container}>
-      <div className="container">
-        <Head>
-          <title>Enthusiastic Panther Shows!</title>
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-
-        <header>
-          Enthusiastic Panther, your favorite made-up band from New Zealand
-        </header>
-        <div className="my-4">
-          <ul>
-            <li>
-              <Link href="songs/">
-                <a>list of songs</a>
-              </Link>
-            </li>
-            <li>
-              <Link href="shows/">
-                <a className="text-white bg-blue-900">recent shows</a>
-              </Link>
-            </li>
-          </ul>
+      <main className="mb-12">
+        <div className="grid grid-cols-5 gap-4 app">
+          {" "}
+          {shows &&
+            shows.map((show) => (
+              <Show
+                location={show.location}
+                avg={show.quality}
+                showid={show.id}
+              />
+            ))}
         </div>
-
-        <main className="mb-12">
-          <div className="app">
-            {shows &&
-              shows.map((show) => (
-                <Show
-                  location={show.location}
-                  avg={show.quality}
-                  showid={show.id}
-                />
-              ))}
-          </div>
-        </main>
-      </div>
+      </main>
     </div>
   );
 }
@@ -117,5 +94,3 @@ export async function getServerSideProps() {
 
   return { props: { shows } };
 }
-
-export default Home;

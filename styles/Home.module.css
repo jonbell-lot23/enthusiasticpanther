@@ -3,6 +3,54 @@
   padding-bottom: 24px;
 }
 
+.albumContainer {
+  width: 50%;
+  max-width: 512px;
+  margin-right: 32px;
+}
+
+.albumImage {
+  object-fit: cover;
+  width: 100%;
+  height: 512px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.albumCanvas {
+  width: 512px;
+  height: 512px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.metadata {
+  padding: 16px;
+  margin-top: 16px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+}
+
+.metadataTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.songContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.songTitle {
+  width: 100%;
+}
+
+.songQuality {
+  text-align: right;
+}
+
 .main {
   min-height: 100vh;
   padding: 4rem 0;
@@ -107,6 +155,11 @@
 .logo {
   height: 1em;
   margin-left: 0.5rem;
+}
+
+.app img {
+  width: 100px; /* adjust as needed */
+  height: auto; /* maintain aspect ratio */
 }
 
 @media (max-width: 600px) {

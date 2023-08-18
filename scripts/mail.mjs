@@ -24,7 +24,7 @@ async function getPastConcerts(prisma) {
   console.log(`Fetching past concerts`);
   const result = await prisma.ep_shows.findMany({
     orderBy: {
-      date: "desc",
+      date: "asc",
     },
     select: {
       location: true,
@@ -39,21 +39,26 @@ async function getPastConcerts(prisma) {
 
 async function getCity(nextCityQuery) {
   const instructions =
-    "You are a helpful assistant that helps the band decide where to go next on a tour. The next city should be geographically close to the previous one in the given list of cities. Avoid suggesting cities that are on different continents or extremely far apart. Please suggest the next city for the tour in the format <City>, <Country>. Never send any information other than that format. For example, San Diego, USA is a good answer. But 'based on your guidelines, I think San Diego, USA is the next stop in your tour' is a bad answer.";
+    "You are a helpful assistant that helps the band decide where to go next on a tour. The next city should be geographically close to the previous one in the given list of cities. If you've recently left a country, don't return to it. Attempt to create a straight path between cities, rather than going south only to go north again. Avoid suggesting cities that are on different continents or extremely far apart. Please suggest the next city for the tour in the format <City>, <Country>. Never send any information other than that format. For example, San Diego, USA is a good answer. But 'based on your guidelines, I think San Diego, USA is the next stop in your tour' is a bad answer.";
+
+  const requestBody = {
+    model: "gpt-3.5-turbo",
+    messages: [
+      { role: "system", content: instructions },
+      { role: "user", content: nextCityQuery },
+    ],
+    max_tokens: 600,
+  };
+
+  console.log("Request to OpenAI API:", JSON.stringify(requestBody, null, 2)); // Log the request body
+
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${process.env.OPENAI_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: instructions },
-        { role: "user", content: nextCityQuery },
-      ],
-      max_tokens: 600,
-    }),
+    body: JSON.stringify(requestBody),
   });
 
   const data = await response.json();
@@ -92,15 +97,21 @@ async function createNewShow() {
     });
     const newId = (maxId ? maxId.id : 0) + 1;
 
-    // Insert the new show using the next city
-    console.log(`Creating new show in: ${nextCity}`);
+    // Get the current date in YYYY-MM-DD format
+    const currentDate = new Date().toISOString().split("T")[0];
+
+    // Insert the new show using the next city and date
+    console.log(`Creating new show in: ${nextCity} on ${currentDate}`);
     const result = await prisma.ep_shows.create({
       data: {
         id: newId,
         location: nextCity,
+        date: currentDate, // Add the date here
       },
     });
-    console.log(`Finished creating new show: ${result.location}`);
+    console.log(
+      `Finished creating new show: ${result.location} on ${result.date}`
+    );
     return result;
   } catch (err) {
     console.error(err);
@@ -110,25 +121,29 @@ async function createNewShow() {
 }
 
 async function addSongsToPerformance(songs, showId) {
-  for (const song of songs) {
-    // Fetch the latest song performance ID
-    const latestPerformance = await prisma.ep_songperformances.findFirst({
-      orderBy: { id: "desc" },
-    });
+  try {
+    for (const song of songs) {
+      // Fetch the latest song performance ID
+      const latestPerformance = await prisma.ep_songperformances.findFirst({
+        orderBy: { id: "desc" },
+      });
 
-    // Increment the latest performance ID by one to create a new unique ID
-    const newPerformanceId = latestPerformance
-      ? Number(latestPerformance.id) + 1
-      : 1;
+      // Increment the latest performance ID by one to create a new unique ID
+      const newPerformanceId = latestPerformance
+        ? Number(latestPerformance.id) + 1
+        : 1;
 
-    await prisma.ep_songperformances.create({
-      data: {
-        id: newPerformanceId,
-        showid: showId, // Now showId is an integer
-        songid: song.id,
-        quality: song.historicalQuality,
-      },
-    });
+      await prisma.ep_songperformances.create({
+        data: {
+          id: newPerformanceId,
+          showid: showId,
+          songid: song.id,
+          quality: song.historicalQuality,
+        },
+      });
+    }
+  } catch (err) {
+    console.error("An error occurred while adding songs to performance:", err);
   }
 }
 
@@ -210,6 +225,10 @@ async function main() {
   console.log(`\nAverage Performance Score: ${averagePerformanceScore}`);
 
   const newShow = await createNewShow();
+  console.log(`New show created with ID: ${newShow.id}`);
+
+  await addSongsToPerformance(songs, newShow.id);
+  console.log("Songs added to performance successfully!");
 
   // Update the quality of the new show with the calculated average performance score
   await prisma.ep_shows.update({
