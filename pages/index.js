@@ -156,8 +156,17 @@ export async function getServerSideProps() {
     take: 8,
   });
 
-  const highlyRatedShows =
-    await prisma.$queryRaw`SELECT * FROM ep_shows ORDER BY RANDOM() LIMIT 8`;
+  // Get the top 20 shows by quality
+  const top20Shows = await prisma.ep_shows.findMany({
+    orderBy: { quality: "desc" },
+    take: 20,
+  });
+
+  // Shuffle the top 20 shows
+  const shuffledTop20Shows = top20Shows.sort(() => 0.5 - Math.random());
+
+  // Take the first 8 from the shuffled list
+  const highlyRatedShows = shuffledTop20Shows.slice(0, 8);
 
   console.log("Latest Shows:", latestShows);
   console.log("Highly Rated Shows:", highlyRatedShows);

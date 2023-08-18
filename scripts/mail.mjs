@@ -204,14 +204,21 @@ async function main() {
     totalPerformanceScore += song.historicalQuality;
   });
 
-  const averagePerformanceScore = totalPerformanceScore / songs.length;
+  const averagePerformanceScore = songs.length
+    ? totalPerformanceScore / songs.length
+    : 0;
   console.log(`\nAverage Performance Score: ${averagePerformanceScore}`);
 
   const newShow = await createNewShow();
-  // console.log(`New show created with ID: ${newShow.id}`);
 
-  // await addSongsToPerformance(songs, newShow.id);
-  // console.log("Songs added to performance successfully!");
+  // Update the quality of the new show with the calculated average performance score
+  await prisma.ep_shows.update({
+    where: { id: newShow.id },
+    data: { quality: averagePerformanceScore },
+  });
+  console.log(
+    `Quality score for show ID ${newShow.id} updated to ${averagePerformanceScore}`
+  );
 
   try {
     await sendPlaylistByEmail(songs);
