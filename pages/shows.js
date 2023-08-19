@@ -3,70 +3,37 @@ import Link from "next/link";
 import styles from "../styles/Home.module.css";
 import { PrismaClient } from "@prisma/client";
 import ShowCard from "../components/ShowCard";
-import React, { useEffect, useState } from "react";
-
-function Show(props) {
-  let bgcolor;
-  if (!props.avg) {
-    bgcolor =
-      "item-container rounded-md mr-4 ml-0 text-black p-1 pl-0 float-left";
-  } else if (props.avg > 65) {
-    bgcolor =
-      "item-container rounded-md mr-4 ml-0 text-green-500 p-1 pl-0 float-left";
-  } else if (props.avg > 52) {
-    bgcolor =
-      "item-container rounded-md mr-4 ml-0 text-gray-800 p-1 pl-0 float-left";
-  } else {
-    bgcolor =
-      "item-container rounded-md mr-4 ml-0 text-red-400 p-1 pl-0 float-left";
-  }
-
-  const showid = "show/" + props.showid;
-
-  const [imageExists, setImageExists] = useState(null);
-
-  useEffect(() => {
-    fetch(`/api/checkImage?showId=${props.showid}`)
-      .then((res) => res.json())
-      .then((data) => setImageExists(data.exists));
-  }, [props.showid]);
-
-  return (
-    <div>
-      <Link href={showid}>
-        <div className={bgcolor}>
-          <div className="w-48 cursor-pointer hover:bg-gray-100">
-            <img
-              src={
-                imageExists === true
-                  ? `/show-art/show${props.showid}.png`
-                  : `/show-art/placeholder.png`
-              }
-              alt={props.location}
-            />
-            <div className="text-xs text-gray-400">{props.location}</div>
-          </div>
-        </div>
-      </Link>
-    </div>
-  );
-}
+import React from "react";
 
 export default function Home({ shows }) {
+  // Group shows by year
+  const showsByYear = shows.reduce((acc, show) => {
+    const year = show.date ? show.date.split("-")[0] : "Unknown"; // Extract the year from the date string
+    acc[year] = acc[year] || [];
+    acc[year].push(show);
+    return acc;
+  }, {});
+
   return (
     <div className={styles.container}>
       <main className="mb-12">
-        <div className="grid grid-cols-5 gap-4 app">
-          {" "}
-          {shows &&
-            shows.map((show) => (
-              <Show
-                location={show.location}
-                avg={show.quality}
-                showid={show.id}
-              />
-            ))}
-        </div>
+        {Object.keys(showsByYear)
+          .sort((a, b) => b - a) // Sort years in descending order
+          .map((year) => (
+            <div key={year}>
+              <h2 className="mb-4 text-2xl font-semibold">{year}</h2>{" "}
+              {/* Year Header */}
+              <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
+                {showsByYear[year].map((show) => (
+                  <ShowCard
+                    showId={show.id}
+                    location={show.location}
+                    key={show.id}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
       </main>
     </div>
   );
@@ -77,7 +44,7 @@ export async function getServerSideProps() {
 
   const shows = await prisma.ep_shows.findMany({
     orderBy: {
-      id: "desc",
+      date: "desc",
     },
   });
 
