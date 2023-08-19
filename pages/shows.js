@@ -1,5 +1,3 @@
-import Head from "next/head";
-import Link from "next/link";
 import styles from "../styles/Home.module.css";
 import { PrismaClient } from "@prisma/client";
 import ShowCard from "../components/ShowCard";
@@ -13,6 +11,11 @@ export default function Home({ shows }) {
     acc[year].push(show);
     return acc;
   }, {});
+
+  // Sort shows within each year by ID in descending order
+  Object.keys(showsByYear).forEach((year) => {
+    showsByYear[year].sort((a, b) => b.id - a.id);
+  });
 
   return (
     <div className={styles.container}>
@@ -44,7 +47,7 @@ export async function getServerSideProps() {
 
   const shows = await prisma.ep_shows.findMany({
     orderBy: {
-      date: "desc",
+      id: "desc",
     },
   });
 
