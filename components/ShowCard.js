@@ -13,7 +13,9 @@ function ShowCard({ showId, location, imageSize = "h-40" }) {
     <div className="p-4">
       <Link href={`show/${showId}`}>
         <div className="bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl">
-          {showId <= 73 || (showId >= 172 && showId <= 219) ? (
+          {showId <= 73 ||
+          (showId >= 172 && showId <= 219) ||
+          [74, 102, 141, 150, 151, 166].includes(showId) ? (
             <img
               src={`/show-art/show${showId}.png`}
               alt={location}
