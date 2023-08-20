@@ -43,7 +43,7 @@ export default function Home({ shows }) {
   );
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const prisma = new PrismaClient();
 
   const shows = await prisma.ep_shows.findMany({
@@ -51,14 +51,6 @@ export async function getServerSideProps() {
       id: "desc",
     },
   });
-
-  // Log the results to the console
-  console.log("Shows data:", shows);
-
-  // Check if the shows array is empty
-  if (shows.length === 0) {
-    console.log("No shows found in the database.");
-  }
 
   // Close the database connection
   await prisma.$disconnect();

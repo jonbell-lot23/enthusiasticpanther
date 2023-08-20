@@ -103,9 +103,22 @@ function Page({ data, showId, location, date }) {
   );
 }
 
-export async function getServerSideProps(context) {
+export async function getStaticPaths() {
   const prisma = new PrismaClient();
-  const showId = Number(context.query.showid);
+  const shows = await prisma.ep_shows.findMany();
+  await prisma.$disconnect();
+
+  // Create paths for each show ID
+  const paths = shows.map((show) => ({
+    params: { showid: show.id.toString() },
+  }));
+
+  return { paths, fallback: false };
+}
+
+export async function getStaticProps(context) {
+  const prisma = new PrismaClient();
+  const showId = Number(context.params.showid);
 
   const showDetails = await prisma.ep_shows.findUnique({
     where: { id: showId },
