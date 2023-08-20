@@ -1,7 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
+import styles from "/styles/Home.module.css"; // Import the styles
 
-function ShowCard({ showId, location, imageSize = "h-full" }) {
+function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
+  let scoreClass = ""; // Declare scoreClass with let
+  if (showScore > 64) scoreClass = "excellent";
+  else if (showScore < 55) scoreClass = "poor";
+
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -114,7 +119,7 @@ function ShowCard({ showId, location, imageSize = "h-full" }) {
   return (
     <div className="p-4">
       <Link href={`show/${showId}`}>
-        <div className="bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl">
+        <div className="relative bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl">
           {showId <= 73 ||
           (showId >= 172 && showId <= 219) ||
           [74, 102, 141, 150, 151, 166].includes(showId) ? (
@@ -129,7 +134,12 @@ function ShowCard({ showId, location, imageSize = "h-full" }) {
               className={`w-full ${imageSize} rounded-t-lg`}
             />
           )}
-          <div className="p-4 text-xs text-gray-700">{location}</div>
+          <div className="flex items-center justify-between p-4">
+            <div className="text-xs text-gray-700">{location}</div>
+            <div className={`p-0 text-right text-xs ${styles[scoreClass]}`}>
+              {showScore}
+            </div>
+          </div>
         </div>
       </Link>
     </div>

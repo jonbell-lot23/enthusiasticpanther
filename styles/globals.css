@@ -4,12 +4,11 @@
 
 html,
 body {
-  padding: 0;
-  margin: 0.5rem;
-  font-family: Menlo, Consolas, "Ubuntu Mono", "Roboto Mono", "DejaVu Sans Mono",
-    monospace;
+  font-family: -apple-system, "Inter", Menlo, Consolas, "Ubuntu Mono",
+    "Roboto Mono", "DejaVu Sans Mono", monospace;
   background-color: #efefef;
-  color: #0f084b;
+  font-weight: bolder;
+  color: #1715167e;
 }
 
 a {

@@ -1,35 +1,34 @@
-import Link from "next/link";
 import { PrismaClient } from "@prisma/client";
 import ShowCard from "../components/ShowCard";
 import React from "react";
 
 export default function Home({ latestShows, highlyRatedShows }) {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen py-12 bg-gray-100">
       <main className="container p-4 mx-auto">
         <section className="mb-12">
-          <h2 className="pl-4 mb-4 text-xl font-semibold">LATEST SHOWS</h2>
+          <h2 className="pl-4 mb-4 text-xl font-bold">Latest shows</h2>
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 md:grid-cols-4">
             {latestShows &&
               latestShows.map((show) => (
                 <ShowCard
                   showId={show.id}
                   location={show.location}
+                  showScore={show.quality}
                   key={show.id}
                 />
               ))}
           </div>
         </section>
         <section className="mx-0 mb-12">
-          <h2 className="pl-4 mb-4 text-xl font-semibold">
-            HIGHLY RATED SHOWS
-          </h2>
+          <h2 className="pl-4 mb-4 text-xl font-bold">Highly rated shows</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
             {highlyRatedShows &&
               highlyRatedShows.map((show) => (
                 <ShowCard
                   showId={show.id}
                   location={show.location}
+                  showScore={show.quality}
                   key={show.id}
                 />
               ))}

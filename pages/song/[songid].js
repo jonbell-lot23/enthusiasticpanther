@@ -21,9 +21,7 @@ function SongPage({ songDetails, performances }) {
       </Head>
 
       <h1 className={styles.songTitle}>{songDetails.name}</h1>
-      <div className={styles.songDetails}>
-        {/* Additional song details can be displayed here */}
-      </div>
+      <div className={styles.songDetails}></div>
 
       <h2 className={styles.performancesTitle}>Performances</h2>
       <div className={styles.performancesContainer}>

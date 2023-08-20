@@ -32,6 +32,7 @@ export default function Home({ shows }) {
                     showId={show.id}
                     location={show.location}
                     key={show.id}
+                    showScore={show.quality}
                   />
                 ))}
               </div>

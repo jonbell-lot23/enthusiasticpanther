@@ -1,12 +1,11 @@
 .container {
-  color: #0f084b;
+  color: #171516;
   padding-bottom: 24px;
 }
 
 .albumContainer {
   width: 50%;
   max-width: 512px;
-  margin-right: 32px;
 }
 
 .albumImage {
@@ -37,10 +36,10 @@
 }
 
 .songContainer {
-  width: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
+  font-weight: normal;
 }
 
 .songTitle {
@@ -48,7 +47,7 @@
 }
 
 .songQuality {
-  text-align: right;
+  margin-right: 0.5rem;
 }
 
 .main {
@@ -160,6 +159,45 @@
 .app img {
   width: 100px; /* adjust as needed */
   height: auto; /* maintain aspect ratio */
+}
+
+.excellent {
+  color: green;
+}
+
+.poor {
+  color: red;
+}
+
+.additionalInfo {
+  color: #3b3b3b;
+  font-weight: normal;
+  font-size: 10px;
+  margin-left: 15px;
+  font-style: italic;
+}
+
+.locationHeader {
+  font-size: 24px;
+  margin-bottom: 0;
+}
+
+.dateSubheader {
+  font-size: 18px;
+  color: #999;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.shownotesHeader {
+  font-size: 18px;
+  color: #3b3b3b;
+  margin: 24px 0 12px;
+}
+
+.shownotes {
+  font-weight: normal;
+  font-size: 12px;
 }
 
 @media (max-width: 600px) {
