@@ -35,4 +35,4 @@ jobs:
         curl -X POST https://api.vercel.com/v1/now/deployments \
           -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
           -H "Content-Type: application/json" \
-          -d '{"projectId": "<YOUR_PROJECT_ID>", "target": "production"}'
+          -d '{"projectId": "prj_ozVwIdKu1CrPRBfaJcwIFE7cjLFu", "target": "production"}'
