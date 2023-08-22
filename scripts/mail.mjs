@@ -83,7 +83,7 @@ async function createNewShow() {
     const pastConcertsList = await getPastConcerts(prisma);
 
     // Query for the next city
-    const nextCityQuery = `These are the venues I've traveled to so far. Please suggest a new city to plan in. Don't repeat cities I've been to recently, and if I've recently switched countries, don't return to the previous country until I've visited the rest of the world first. ${pastConcertsList}`;
+    const nextCityQuery = `These are the venues I've traveled to so far, from oldest to newest. Please suggest a new city to plan in. Don't repeat cities I've been to recently, and if I've recently switched countries, don't return to the previous country until I've visited the rest of the world first. ${pastConcertsList}`;
     const nextCity = await getCity(nextCityQuery);
 
     // Get the maximum existing ID
