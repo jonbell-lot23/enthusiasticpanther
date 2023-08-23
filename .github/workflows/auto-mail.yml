@@ -1,4 +1,4 @@
-name: Send auto-email and Redeploy Vercel
+name: Send auto-email
 
 on:
   schedule:
@@ -20,7 +20,7 @@ jobs:
     - name: Setup Node.js environment
       uses: actions/setup-node@v2
       with:
-        node-version: '18' # Updated to Node.js 18
+        node-version: '18'
 
     - name: Install dependencies
       run: npm install
@@ -29,10 +29,3 @@ jobs:
       run: node scripts/mail.mjs
       env:
         OPENAI_KEY: ${{ secrets.NEXT_PUBLIC_OPENAI_API_KEY }}
-
-    - name: Trigger Vercel Redeployment
-      run: |
-        curl -X POST https://api.vercel.com/v1/now/deployments \
-          -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '{"projectId": "prj_ozVwIdKu1CrPRBfaJcwIFE7cjLFu", "target": "production"}'
