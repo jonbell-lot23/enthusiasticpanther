@@ -121,7 +121,7 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
       <Link href={`show/${showId}`}>
         <div className="relative bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl">
           {showId <= 73 ||
-          (showId >= 172 && showId <= 219) ||
+          (showId >= 172 && showId <= 228) ||
           [74, 102, 141, 150, 151, 166].includes(showId) ? (
             <img
               src={`/show-art/show${showId}.png`}
