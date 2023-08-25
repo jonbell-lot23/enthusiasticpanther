@@ -161,14 +161,14 @@ async function addSongsToPerformance(songs, showId) {
         ? Number(latestPerformance.id) + 1
         : 1;
 
-      /* await prisma.ep_songperformances.create({
+      await prisma.ep_songperformances.create({
         data: {
           id: newPerformanceId,
           showid: showId,
           songid: song.id,
           quality: song.historicalQuality,
         },
-      }); */
+      });
     }
   } catch (err) {
     console.error("An error occurred while adding songs to performance:", err);
@@ -259,10 +259,10 @@ async function main() {
   console.log("Songs added to performance successfully!");
 
   // Update the quality of the new show with the calculated average performance score
-  /* await prisma.ep_shows.update({
+  await prisma.ep_shows.update({
     where: { id: newShow.id },
     data: { quality: averagePerformanceScore },
-  }); */
+  });
   console.log(
     `Quality score for show ID ${newShow.id} updated to ${averagePerformanceScore}`
   );
