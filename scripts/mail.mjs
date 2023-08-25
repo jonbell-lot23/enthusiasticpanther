@@ -1,9 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 import { Resend } from "resend";
 import fetch from "node-fetch";
+import { Random } from "random-js";
+import crypto from "crypto";
+
+const random = new Random();
+const generateRandomValue = () => {
+  return parseInt(crypto.randomBytes(4).toString("hex"), 16);
+};
 
 const prisma = new PrismaClient();
 const resend = new Resend("re_7nsaGUMW_KVKi5vMNmwXgFWxS7QftNfph");
+
+function generateRandomFloat(min, max) {
+  const randomValue = generateRandomValue() / 0xffffffff;
+  return min + (max - min) * randomValue;
+}
 
 async function calculateHistoricalQuality(songId) {
   const performances = await prisma.ep_songperformances.findMany({
@@ -17,7 +29,23 @@ async function calculateHistoricalQuality(songId) {
 
   const averageQuality = totalQuality / performances.length;
 
-  return Math.floor(averageQuality);
+  // Define the range
+  const lowerBound = averageQuality - 10;
+  const upperBound = averageQuality + 40;
+
+  // Generate a random quality score within the range
+  let qualityScore = Math.round(generateRandomFloat(lowerBound, upperBound));
+
+  // Apply a transformation to approximate a normal distribution
+  qualityScore = Math.round(
+    ((qualityScore - lowerBound) / (upperBound - lowerBound)) * 100
+  );
+
+  // Ensure the quality score is within the range of 0 to 100
+  qualityScore = Math.max(0, qualityScore);
+  qualityScore = Math.min(100, qualityScore);
+
+  return qualityScore;
 }
 
 async function getPastConcerts(prisma) {
@@ -133,14 +161,14 @@ async function addSongsToPerformance(songs, showId) {
         ? Number(latestPerformance.id) + 1
         : 1;
 
-      await prisma.ep_songperformances.create({
+      /* await prisma.ep_songperformances.create({
         data: {
           id: newPerformanceId,
           showid: showId,
           songid: song.id,
           quality: song.historicalQuality,
         },
-      });
+      }); */
     }
   } catch (err) {
     console.error("An error occurred while adding songs to performance:", err);
@@ -231,10 +259,10 @@ async function main() {
   console.log("Songs added to performance successfully!");
 
   // Update the quality of the new show with the calculated average performance score
-  await prisma.ep_shows.update({
+  /* await prisma.ep_shows.update({
     where: { id: newShow.id },
     data: { quality: averagePerformanceScore },
-  });
+  }); */
   console.log(
     `Quality score for show ID ${newShow.id} updated to ${averagePerformanceScore}`
   );
