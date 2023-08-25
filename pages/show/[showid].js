@@ -105,15 +105,17 @@ function Page({ data, showId, location, date }) {
 
 export async function getStaticPaths() {
   const prisma = new PrismaClient();
-  const shows = await prisma.ep_shows.findMany();
+  const shows = await prisma.ep_shows.findMany({
+    orderBy: { id: "desc" },
+    take: 10,
+  });
   await prisma.$disconnect();
 
-  // Create paths for each show ID
   const paths = shows.map((show) => ({
     params: { showid: show.id.toString() },
   }));
 
-  return { paths, fallback: false };
+  return { paths, fallback: "blocking" };
 }
 
 export async function getStaticProps(context) {
