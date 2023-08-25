@@ -1,6 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import ShowCard from "../components/ShowCard";
 import React from "react";
+const cache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour
+
+import NodeCache from "node-cache";
 
 export default function Home({ latestShows, highlyRatedShows }) {
   return (
@@ -42,16 +45,24 @@ export default function Home({ latestShows, highlyRatedShows }) {
 export async function getServerSideProps() {
   const prisma = new PrismaClient();
 
-  const latestShows = await prisma.ep_shows.findMany({
-    orderBy: { id: "desc" },
-    take: 8,
-  });
+  let latestShows = cache.get("latestShows");
+  if (!latestShows) {
+    latestShows = await prisma.ep_shows.findMany({
+      orderBy: { id: "desc" },
+      take: 8,
+    });
+    cache.set("latestShows", latestShows);
+  }
 
   // Get the top 20 shows by quality
-  const top20Shows = await prisma.ep_shows.findMany({
-    orderBy: { quality: "desc" },
-    take: 20,
-  });
+  let top20Shows = cache.get("top20Shows");
+  if (!top20Shows) {
+    top20Shows = await prisma.ep_shows.findMany({
+      orderBy: { quality: "desc" },
+      take: 20,
+    });
+    cache.set("top20Shows", top20Shows);
+  }
 
   // Shuffle the top 20 shows
   const shuffledTop20Shows = top20Shows.sort(() => 0.5 - Math.random());
