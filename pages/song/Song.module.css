@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.performancesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  width: auto;
+}
+
+.performanceContainer {
+  margin: 10px;
+  text-align: left;
+}
+
+.card {
+  width: 240px;
+}
