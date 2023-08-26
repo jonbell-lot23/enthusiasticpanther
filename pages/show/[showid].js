@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import styles from "../../styles/Home.module.css";
 import { PrismaClient } from "@prisma/client";
 import React, { useEffect, useRef } from "react";
@@ -13,7 +14,9 @@ function Song(props) {
   return (
     <div className={`${styles.songContainer} ${styles[qualityClass]}`}>
       <div className={styles.songTitle}>
-        {props.name}
+        <Link href={`/song/${props.songId}`}>
+          <a>{props.name}</a>
+        </Link>
         {props.footnoteIndex !== null && <sup>[{props.footnoteIndex}]</sup>}
       </div>
     </div>
@@ -50,6 +53,7 @@ function Page({ data, showId, location, date }) {
         name={song.name}
         quality={song.quality}
         footnoteIndex={footnoteIndex}
+        songId={song.id} // Pass songId as a prop
       />
     );
   });
@@ -154,6 +158,7 @@ export async function getStaticProps(context) {
         quality: performance.quality,
         isDebut,
         gap,
+        id: song.id,
       };
     })
   );

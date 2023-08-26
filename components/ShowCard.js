@@ -118,10 +118,10 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
 
   return (
     <div className="p-4">
-      <Link href={`show/${showId}`}>
+      <Link href={`/show/${showId}`}>
         <div className="relative bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl">
           {showId <= 73 ||
-          (showId >= 172 && showId <= 228) ||
+          (showId >= 172 && showId <= 235) ||
           [74, 102, 141, 150, 151, 166].includes(showId) ? (
             <img
               src={`/show-art/show${showId}.png`}
@@ -135,7 +135,9 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
             />
           )}
           <div className="flex items-center justify-between p-4">
-            <div className="text-xs text-gray-700">{location}</div>
+            <div className="text-xs text-gray-700 truncate w-full max-w-[calc(100%-1.5rem)]">
+              {location}
+            </div>
             <div className={`p-0 text-right text-xs ${styles[scoreClass]}`}>
               {showScore}
             </div>
