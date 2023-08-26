@@ -29,23 +29,29 @@ async function calculateHistoricalQuality(songId) {
 
   const averageQuality = totalQuality / performances.length;
 
-  // Define the range
-  const lowerBound = averageQuality - 10;
-  const upperBound = averageQuality + 40;
+  let lowerBound = 0; // Default lower bound
+  let upperBound = 100; // Default upper bound
+
+  // Apply the range only if the song has been played more than 5 times
+  if (performances.length > 5) {
+    lowerBound = averageQuality - 10;
+    upperBound = averageQuality + 40;
+  }
 
   // Generate a random quality score within the range
-  let qualityScore = Math.round(generateRandomFloat(lowerBound, upperBound));
-
-  // Apply a transformation to approximate a normal distribution
-  qualityScore = Math.round(
-    ((qualityScore - lowerBound) / (upperBound - lowerBound)) * 100
+  const randomQualityScore = Math.round(
+    generateRandomFloat(lowerBound, upperBound)
   );
 
   // Ensure the quality score is within the range of 0 to 100
-  qualityScore = Math.max(0, qualityScore);
-  qualityScore = Math.min(100, qualityScore);
+  let finalQualityScore = Math.max(0, randomQualityScore);
+  finalQualityScore = Math.min(100, finalQualityScore);
 
-  return qualityScore;
+  console.log(
+    `SongID: ${songId} | Avg: ${averageQuality} | Rand: ${randomQualityScore} | Final score: ${finalQualityScore}`
+  );
+
+  return finalQualityScore;
 }
 
 async function getPastConcerts(prisma) {
@@ -187,6 +193,11 @@ async function getRandomSongs() {
     where: { weighting: { not: 0 } },
   });
 
+  function calculateThrillFactor(gap) {
+    if (gap <= 10) return 0;
+    return 6 * Math.log10(gap - 9);
+  }
+
   const shuffledSongs = songs.sort(() => 0.5 - Math.random());
 
   for (const song of shuffledSongs) {
@@ -213,8 +224,14 @@ async function getRandomSongs() {
 
     if (randomSongs.some((rSong) => rSong.id === song.id)) continue;
 
+    const thrillFactor = calculateThrillFactor(gap);
+
     song.historicalQuality = await calculateHistoricalQuality(song.id);
+    song.historicalQuality += thrillFactor;
+    song.historicalQuality = Math.min(100, song.historicalQuality); // Cap at 100
     song.gap = gap;
+    song.thrillFactor = thrillFactor; // Save this for logging
+
     randomSongs.push(song);
   }
 
@@ -243,7 +260,10 @@ async function main() {
 
   console.log("Playlist:");
   songs.forEach((song) => {
-    console.log(`* ${song.name} (${song.historicalQuality}% Gap: ${song.gap})`);
+    console.log(
+      `* ${song.name} | Avg: ${song.averageQuality} | Rand: ${song.randomQualityScore} | Gap: ${song.gap} | Thrill: ${song.thrillFactor} | Final score: ${song.historicalQuality}`
+    );
+
     totalPerformanceScore += song.historicalQuality;
   });
 
