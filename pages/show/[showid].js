@@ -4,16 +4,20 @@ import styles from "../../styles/Home.module.css";
 import { PrismaClient } from "@prisma/client";
 import React, { useEffect, useRef } from "react";
 import ShowCard from "../../components/ShowCard";
+import cardStyles from "../../components/ShowCard.module.css"; // Import the new CSS module
 
 function Song(props) {
   // Determine the class based on quality
-  let qualityClass = "";
-  if (props.quality > 73) qualityClass = "excellent";
-  else if (props.quality < 40) qualityClass = "poor";
+  let qualityClass =
+    props.quality > 73
+      ? cardStyles.excellent
+      : props.quality < 40
+      ? cardStyles.poor
+      : "";
 
   return (
-    <div className={`${styles.songContainer} ${styles[qualityClass]}`}>
-      <div className={styles.songTitle}>
+    <div className={`${cardStyles.songContainer} ${qualityClass}`}>
+      <div className={cardStyles.songTitle}>
         <Link href={`/song/${props.songId}`}>
           <a>{props.name}</a>
         </Link>

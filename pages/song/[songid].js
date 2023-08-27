@@ -5,7 +5,9 @@ import ShowCard from "../../components/ShowCard";
 function SongPage({ songDetails, performances }) {
   return (
     <div className={styles.container}>
-      <h1 className={styles.songTitle}>{songDetails.name}</h1>
+      <h2 className="w-full my-4 text-2xl font-semibold text-left pl-7">
+        {songDetails.name}
+      </h2>
       <div className={styles.performancesContainer}>
         {performances &&
           performances.map((performance) => (

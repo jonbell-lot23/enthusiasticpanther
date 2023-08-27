@@ -1,11 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import styles from "/styles/Home.module.css"; // Import the styles
+import cardStyles from "./ShowCard.module.css"; // Import the new CSS module
 
 function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
-  let scoreClass = ""; // Declare scoreClass with let
-  if (showScore > 64) scoreClass = "excellent";
-  else if (showScore < 55) scoreClass = "poor";
+  let qualityClass =
+    showScore > 70
+      ? cardStyles.excellent
+      : showScore < 40
+      ? cardStyles.poor
+      : "";
 
   const canvasRef = useRef(null);
 
@@ -117,28 +121,23 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
   }, [showId]);
 
   return (
-    <div className="p-4">
+    <div className={cardStyles.cardContainer}>
       <Link href={`/show/${showId}`}>
-        <div className="relative bg-white rounded-lg shadow-lg cursor-pointer hover:shadow-xl">
+        <div className={cardStyles.linkContainer}>
           {showId <= 73 ||
           (showId >= 172 && showId <= 235) ||
           [74, 102, 141, 150, 151, 166].includes(showId) ? (
             <img
               src={`/show-art/show${showId}.png`}
               alt={location}
-              className={`object-cover w-full ${imageSize} rounded-t-lg`}
+              className={cardStyles.imageContainer}
             />
           ) : (
-            <canvas
-              ref={canvasRef}
-              className={`w-full ${imageSize} rounded-t-lg`}
-            />
+            <canvas ref={canvasRef} className={cardStyles.imageContainer} />
           )}
-          <div className="flex items-center justify-between p-4">
-            <div className="text-xs text-gray-700 truncate w-full max-w-[calc(100%-1.5rem)]">
-              {location}
-            </div>
-            <div className={`p-0 text-right text-xs ${styles[scoreClass]}`}>
+          <div className={cardStyles.infoContainer}>
+            <div className={cardStyles.locationText}>{location}</div>
+            <div className={`${cardStyles.scoreText} ${qualityClass}`}>
               {showScore}
             </div>
           </div>

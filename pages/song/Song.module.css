@@ -9,13 +9,17 @@
   flex-wrap: wrap;
   justify-content: left;
   width: auto;
+  margin-left: 20px;
 }
 
 .performanceContainer {
-  margin: 10px;
   text-align: left;
 }
 
 .card {
   width: 180px;
+}
+
+.songTitle {
+  text-align: left;
 }

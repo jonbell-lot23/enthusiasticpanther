@@ -1,0 +1,68 @@
+.cardContainer {
+  padding: 0.5rem;
+}
+
+.linkContainer {
+  position: relative;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.linkContainer:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.imageContainer {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.infoContainer {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.locationText {
+  font-size: 0.75rem;
+  color: #4a5568;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: calc(100% - 1.5rem);
+}
+.songContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-weight: normal;
+}
+
+.songTitle {
+  width: 100%;
+}
+
+.songQuality {
+  margin-right: 0.5rem;
+}
+
+.scoreText {
+  padding: 0;
+  text-align: right;
+  font-size: 0.75rem;
+}
+
+.excellent {
+  color: green;
+}
+
+.poor {
+  color: red;
+}
