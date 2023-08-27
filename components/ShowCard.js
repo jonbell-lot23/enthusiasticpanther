@@ -66,7 +66,7 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
       "#8099FF",
       "#4D66FF",
       "#1A33FF", // Blue
-      "#C2B3FF",
+      "#C2C3FF",
       "#A480FF",
       "#8652FF",
       "#6724FF", // Indigo
