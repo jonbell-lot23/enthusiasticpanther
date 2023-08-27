@@ -1,6 +1,7 @@
 .container {
   color: #171516;
   padding-bottom: 24px;
+  flex: 1;
 }
 
 .albumContainer {
@@ -204,5 +205,12 @@
   .grid {
     width: 100%;
     flex-direction: column;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+  }
+  .albumContainer {
   }
 }

@@ -72,13 +72,13 @@ function Page({ data, showId, location, date }) {
   );
 
   return (
-    <div className={styles.container}>
-      <div className="container">
-        <Head>
-          <title>Enthusiastic Shows</title>
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
+    <>
+      <Head>
+        <title>Enthusiastic Shows</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
+      <div className={styles.container}>
         <div className="flex m-4">
           <div className={styles.albumContainer}>
             <ShowCard showId={showId} location={location} showScore={score} />
@@ -107,7 +107,7 @@ function Page({ data, showId, location, date }) {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

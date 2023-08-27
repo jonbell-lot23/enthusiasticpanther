@@ -16,8 +16,8 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
   useEffect(() => {
     if (
       showId <= 73 ||
-      (showId >= 172 && showId <= 219) ||
-      [74, 102, 141, 150, 151, 166].includes(showId)
+      (showId >= 150 && showId <= 219) ||
+      [74, 102, 141].includes(showId)
     ) {
       return;
     }
@@ -125,8 +125,8 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
       <Link href={`/show/${showId}`}>
         <div className={cardStyles.linkContainer}>
           {showId <= 73 ||
-          (showId >= 172 && showId <= 235) ||
-          [74, 102, 141, 150, 151, 166].includes(showId) ? (
+          (showId >= 150 && showId <= 235) ||
+          [74, 102, 141].includes(showId) ? (
             <img
               src={`/show-art/show${showId}.png`}
               alt={location}
