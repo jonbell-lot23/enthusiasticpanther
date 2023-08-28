@@ -12,14 +12,23 @@ function SongPage({ songDetails, performances }) {
       <div className={styles.performancesContainer}>
         {performances &&
           performances.map((performance, index) => (
-            <div key={index} className={styles.card}>
+            <div
+              key={index}
+              className={performance.type === "show" ? styles.card : styles.gap}
+            >
               {performance.type === "show" ? (
                 <ShowCard
                   showId={performance.showId}
                   location={performance.location}
                   showScore={performance.quality}
                 />
-              ) : null}
+              ) : (
+                <div className={styles.gapContainer}>
+                  {[...Array(performance.gap)].map((_, i) => (
+                    <div key={i}>.</div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
       </div>
@@ -47,9 +56,14 @@ export async function getServerSideProps(context) {
       where: { id: performance.showid },
     });
 
-    // Calculate the gap between the current show and the previous one
-    const gap = previousShowId ? previousShowId - performance.showid : null;
-    previousShowId = performance.showid;
+    // If there's a previous show, calculate the gap and add it to the performances array
+    if (previousShowId) {
+      const gap = previousShowId - performance.showid;
+      performances.push({
+        type: "gap",
+        gap,
+      });
+    }
 
     // Add the show to the performances array
     performances.push({
@@ -60,14 +74,7 @@ export async function getServerSideProps(context) {
       showId: performance.showid,
     });
 
-    // If there's a gap, add it to the performances array
-    /*
-    if (gap) {
-      performances.push({
-        type: "gap",
-        gap,
-      });
-    }*/
+    previousShowId = performance.showid;
   }
 
   await prisma.$disconnect();
