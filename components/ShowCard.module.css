@@ -1,5 +1,18 @@
-.cardContainer {
+.cardContainer,
+.gapContainer {
   padding: 0.5rem;
+}
+
+.gapContainer {
+  padding: 0.5rem;
+  background-color: #fff;
+  border-radius: 0.5rem;
+  width: 180px;
+}
+
+.gapSpacer {
+  width: 30px;
+  height: 30px;
 }
 
 .linkContainer {

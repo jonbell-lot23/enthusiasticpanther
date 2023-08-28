@@ -1,6 +1,7 @@
 import styles from "./Song.module.css"; // Update stylesheet for song details
 import { PrismaClient } from "@prisma/client";
 import ShowCard from "../../components/ShowCard";
+import GapCard from "../../components/GapCard";
 
 function SongPage({ songDetails, performances }) {
   return (
@@ -17,7 +18,7 @@ function SongPage({ songDetails, performances }) {
                 location={performance.location}
                 showScore={performance.quality}
               />
-
+              {performance.gap && <GapCard />}
               {performance.isDebut && (
                 <p className="text-xs">{performance.quality}</p>
               )}
@@ -32,18 +33,14 @@ export async function getServerSideProps(context) {
   const prisma = new PrismaClient();
   const songId = Number(context.query.songid);
 
-  // Fetch the details for the given song ID
-  const songDetails = await prisma.ep_songs.findUnique({
-    where: { id: songId },
-  });
-
   // Fetch the song performances for the given song ID
   const songPerformances = await prisma.ep_songperformances.findMany({
     where: { songid: songId },
     orderBy: { id: "desc" },
   });
 
-  // Map the song performances to include show details
+  // Map the song performances to include show details and the gap between shows
+  let previousShowId = null;
   const performances = await Promise.all(
     songPerformances.map(async (performance) => {
       // Fetch show details for each performance
@@ -51,17 +48,25 @@ export async function getServerSideProps(context) {
         where: { id: performance.showid },
       });
 
+      // Calculate the gap between the current show and the previous one
+      const gap = previousShowId ? previousShowId - performance.showid : null;
+      previousShowId = performance.showid;
+
       return {
         location: show.location,
         date: show.date,
         quality: performance.quality,
         showId: performance.showid,
+        gap,
       };
     })
   );
 
   await prisma.$disconnect();
 
+  const songDetails = await prisma.ep_songs.findUnique({
+    where: { id: songId },
+  });
   return { props: { songDetails, performances } };
 }
 
