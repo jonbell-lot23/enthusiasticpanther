@@ -183,6 +183,7 @@ async function addSongsToPerformance(songs, showId) {
 
 async function getRandomSongs() {
   const randomSongs = [];
+  const usedGaps = new Set();
   const latestConcert = await prisma.ep_shows.findFirst({
     orderBy: { id: "desc" },
   });
@@ -203,6 +204,11 @@ async function getRandomSongs() {
   for (const song of shuffledSongs) {
     if (randomSongs.length >= numberOfSongs) break;
 
+    const gap = Number(latestConcert.id) - Number(latestPerformance.showid);
+    if (gap < 4 || usedGaps.has(gap)) continue; // Skip if gap is already used
+
+    usedGaps.add(gap); // Add gap to the set of used gaps
+
     const latestPerformance = await prisma.ep_songperformances.findFirst({
       where: { songid: song.id },
       orderBy: { id: "desc" },
@@ -219,6 +225,16 @@ async function getRandomSongs() {
     ); */
 
     const gap = Number(latestConcert.id) - Number(latestPerformance.showid);
+    if (gap < 4 || usedGaps.has(gap)) continue; // Skip if gap is already used
+
+    usedGaps.add(gap); // Add gap to the set of used gaps
+
+    const latestPerformance = await prisma.ep_songperformances.findFirst({
+      where: { songid: song.id },
+      orderBy: { id: "desc" },
+    });
+
+    if (!latestPerformance) continue;
 
     if (gap < 4) continue;
 
