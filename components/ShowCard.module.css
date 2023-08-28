@@ -4,10 +4,7 @@
 }
 
 .gapContainer {
-  padding: 0.5rem;
-  background-color: #fff;
-  border-radius: 0.5rem;
-  width: 180px;
+  display: none;
 }
 
 .gapSpacer {

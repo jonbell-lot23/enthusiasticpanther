@@ -11,17 +11,15 @@ function SongPage({ songDetails, performances }) {
       </h2>
       <div className={styles.performancesContainer}>
         {performances &&
-          performances.map((performance) => (
-            <div key={performance.id} className={styles.card}>
-              <ShowCard
-                showId={performance.showId}
-                location={performance.location}
-                showScore={performance.quality}
-              />
-              {performance.gap && <GapCard />}
-              {performance.isDebut && (
-                <p className="text-xs">{performance.quality}</p>
-              )}
+          performances.map((performance, index) => (
+            <div key={index} className={styles.card}>
+              {performance.type === "show" ? (
+                <ShowCard
+                  showId={performance.showId}
+                  location={performance.location}
+                  showScore={performance.quality}
+                />
+              ) : null}
             </div>
           ))}
       </div>
@@ -41,26 +39,36 @@ export async function getServerSideProps(context) {
 
   // Map the song performances to include show details and the gap between shows
   let previousShowId = null;
-  const performances = await Promise.all(
-    songPerformances.map(async (performance) => {
-      // Fetch show details for each performance
-      const show = await prisma.ep_shows.findUnique({
-        where: { id: performance.showid },
-      });
+  const performances = [];
 
-      // Calculate the gap between the current show and the previous one
-      const gap = previousShowId ? previousShowId - performance.showid : null;
-      previousShowId = performance.showid;
+  for (const performance of songPerformances) {
+    // Fetch show details for each performance
+    const show = await prisma.ep_shows.findUnique({
+      where: { id: performance.showid },
+    });
 
-      return {
-        location: show.location,
-        date: show.date,
-        quality: performance.quality,
-        showId: performance.showid,
+    // Calculate the gap between the current show and the previous one
+    const gap = previousShowId ? previousShowId - performance.showid : null;
+    previousShowId = performance.showid;
+
+    // Add the show to the performances array
+    performances.push({
+      type: "show",
+      location: show.location,
+      date: show.date,
+      quality: performance.quality,
+      showId: performance.showid,
+    });
+
+    // If there's a gap, add it to the performances array
+    /*
+    if (gap) {
+      performances.push({
+        type: "gap",
         gap,
-      };
-    })
-  );
+      });
+    }*/
+  }
 
   await prisma.$disconnect();
 
