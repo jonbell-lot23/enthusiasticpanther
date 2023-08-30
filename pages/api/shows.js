@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../prisma";
 
 export default async function handler(req, res) {
-  const prisma = new PrismaClient();
-
   let latestShows = await prisma.ep_shows.findMany({
     orderBy: { id: "desc" },
     take: 8,

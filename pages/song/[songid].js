@@ -1,5 +1,6 @@
 import styles from "./Song.module.css"; // Update stylesheet for song details
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../prisma";
+
 import ShowCard from "../../components/ShowCard";
 import GapCard from "../../components/GapCard";
 
@@ -37,7 +38,6 @@ function SongPage({ songDetails, performances }) {
 }
 
 export async function getServerSideProps(context) {
-  const prisma = new PrismaClient();
   const songId = Number(context.query.songid);
 
   // Fetch the song performances for the given song ID

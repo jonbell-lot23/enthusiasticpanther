@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../prisma";
+
 import { Resend } from "resend";
 import fetch from "node-fetch";
 import { Random } from "random-js";
@@ -9,7 +10,6 @@ const generateRandomValue = () => {
   return parseInt(crypto.randomBytes(4).toString("hex"), 16);
 };
 
-const prisma = new PrismaClient();
 const resend = new Resend("re_7nsaGUMW_KVKi5vMNmwXgFWxS7QftNfph");
 
 function generateRandomFloat(min, max) {
@@ -110,8 +110,6 @@ async function getCity(nextCityQuery) {
 }
 
 async function createNewShow() {
-  const prisma = new PrismaClient();
-
   try {
     // Fetch past concerts
     const pastConcertsList = await getPastConcerts(prisma);

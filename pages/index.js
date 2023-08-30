@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../prisma";
 import ShowCard from "../components/ShowCard";
 import React from "react";
 const cache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour
@@ -43,8 +43,6 @@ export default function Home({ latestShows, highlyRatedShows }) {
 }
 
 export async function getServerSideProps() {
-  const prisma = new PrismaClient();
-
   let latestShows = cache.get("latestShows");
   if (!latestShows) {
     latestShows = await prisma.ep_shows.findMany({

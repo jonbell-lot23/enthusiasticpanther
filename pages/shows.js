@@ -1,5 +1,5 @@
 import styles from "../styles/Home.module.css";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../prisma";
 import ShowCard from "../components/ShowCard";
 import React from "react";
 
@@ -44,16 +44,11 @@ export default function Home({ shows }) {
 }
 
 export async function getStaticProps() {
-  const prisma = new PrismaClient();
-
   const shows = await prisma.ep_shows.findMany({
     orderBy: {
       id: "desc",
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 
   return { props: { shows } };
 }

@@ -1,7 +1,8 @@
 import Head from "next/head";
 import Link from "next/link";
 import styles from "../../styles/Home.module.css";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../prisma";
+
 import React, { useEffect, useRef } from "react";
 import ShowCard from "../../components/ShowCard";
 import cardStyles from "../../components/ShowCard.module.css"; // Import the new CSS module
@@ -112,7 +113,6 @@ function Page({ data, showId, location, date }) {
 }
 
 export async function getStaticPaths() {
-  const prisma = new PrismaClient();
   const shows = await prisma.ep_shows.findMany({
     orderBy: { id: "desc" },
     take: 10,
@@ -127,7 +127,6 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps(context) {
-  const prisma = new PrismaClient();
   const showId = Number(context.params.showid);
 
   const showDetails = await prisma.ep_shows.findUnique({

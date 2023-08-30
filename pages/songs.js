@@ -1,6 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../../prisma";
+
 import styles from "../styles/Home.module.css";
 
 function Song(props) {
@@ -63,8 +64,6 @@ function Home({ songs }) {
 }
 
 export async function getServerSideProps() {
-  const prisma = new PrismaClient();
-
   const songs = await prisma.ep_songs.findMany({
     orderBy: {
       id: "desc",
