@@ -1,4 +1,4 @@
-import prisma from "../prisma";
+import prisma from "/prisma";
 import ShowCard from "../components/ShowCard";
 import React from "react";
 const cache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour

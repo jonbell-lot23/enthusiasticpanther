@@ -1,5 +1,5 @@
 import styles from "../styles/Home.module.css";
-import prisma from "../prisma";
+import prisma from "/prisma";
 import ShowCard from "../components/ShowCard";
 import React from "react";
 

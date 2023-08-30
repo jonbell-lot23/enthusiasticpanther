@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import styles from "../../styles/Home.module.css";
-import prisma from "../../prisma";
+import prisma from "/prisma";
 
 import React, { useEffect, useRef } from "react";
 import ShowCard from "../../components/ShowCard";
