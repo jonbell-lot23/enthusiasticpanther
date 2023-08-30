@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import prisma from "/prisma";
 
 import { Resend } from "resend";
 import fetch from "node-fetch";

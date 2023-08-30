@@ -1,4 +1,4 @@
-import prisma from "../../prisma";
+import prisma from "/prisma";
 
 export default async function handler(req, res) {
   let latestShows = await prisma.ep_shows.findMany({

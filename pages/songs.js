@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
-import prisma from "../../prisma";
+import prisma from "/prisma";
 
 import styles from "../styles/Home.module.css";
 

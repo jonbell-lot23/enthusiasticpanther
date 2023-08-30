@@ -1,5 +1,5 @@
 import styles from "./Song.module.css"; // Update stylesheet for song details
-import prisma from "../../prisma";
+import prisma from "/prisma";
 
 import ShowCard from "../../components/ShowCard";
 import GapCard from "../../components/GapCard";
