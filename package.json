@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "if [ \"$OSTYPE\" = \"darwin20.0\" ] && [ \"$(uname -m)\" = \"arm64\" ]; then npm install @next/swc-darwin-arm64@^13.4.19; fi"
+
   },
   "dependencies": {
     "@mdx-js/loader": "^2.0.0",
