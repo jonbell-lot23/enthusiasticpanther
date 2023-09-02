@@ -35,24 +35,8 @@ function Home({ songs }) {
           <title>Enthusiastic Panther Songs</title>
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <header>
-          enthusiastic panther, your favourite made-up band from New Zealand
-        </header>
-        <div className="my-4">
-          <ul>
-            <li>
-              <Link href="songs/">
-                <a className="text-white bg-blue-900">list of songs</a>
-              </Link>
-            </li>
-            <li>
-              <Link href="shows/">
-                <a>recent shows</a>
-              </Link>
-            </li>
-          </ul>
-        </div>
-        <main className="mb-12">
+
+        <main className="m-12">
           <div className="app">
             {songs &&
               songs.map((song) => <Song name={song.name} avg={song.avg} />)}

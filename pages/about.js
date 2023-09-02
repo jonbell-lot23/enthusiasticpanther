@@ -4,8 +4,8 @@ export default function About() {
   return (
     <div>
       <main>
-        <p>
-          Edit this paragraph to include information about Enthusiastic Panther.
+        <p className="m-12">
+          Enthuiastic Panther is a made-up band. Stay tuned.
         </p>
       </main>
     </div>
