@@ -5,29 +5,33 @@ import ReactDOM from "react-dom";
 import styles from "../styles/Home.module.css";
 
 export default function Home() {
-  
-  console.log("yo");
-  
-  useEffect(() => {      
+  useEffect(() => {
     document.getElementById("mybutton3").focus();
   });
-  
+
   return (
-
-      
-            
-      <div className="my-4">
-       Hello, I am practicing a form.
-       <br /><br />
-       <button id="mybutton1" className="bg-white rounded-sm p-2 text-black hover:bg-gray-100 mr-4">Title</button>
-       
-       <button id="mybutton2" className="bg-white rounded-sm p-2 text-black hover:bg-gray-100 mr-4">Title</button>
-       
-       <button id="mybutton3" className="bg-white rounded-sm p-2 text-black hover:bg-gray-100 mr-4">Title</button>
-       
-      </div>
-    
-    
-
+    <div className="my-4">
+      Hello, I am practicing a form.
+      <br />
+      <br />
+      <button
+        id="mybutton1"
+        className="p-2 mr-4 text-black bg-white rounded-sm hover:bg-gray-100"
+      >
+        Title
+      </button>
+      <button
+        id="mybutton2"
+        className="p-2 mr-4 text-black bg-white rounded-sm hover:bg-gray-100"
+      >
+        Title
+      </button>
+      <button
+        id="mybutton3"
+        className="p-2 mr-4 text-black bg-white rounded-sm hover:bg-gray-100"
+      >
+        Title
+      </button>
+    </div>
   );
 }
