@@ -189,56 +189,57 @@ async function getRandomSongs() {
   });
   if (!latestConcert) return randomSongs;
 
-  const numberOfSongs = Math.floor(Math.random() * 5) + 11;
-  const songs = await prisma.ep_songs.findMany({
-    where: { weighting: { not: 0 } },
+  // Fetch new songs and add them to the playlist
+  const newSongs = await prisma.ep_songs.findMany({
+    where: { id: { gte: 118, lte: 137 } }, // Adjust the range as needed
+    orderBy: { id: "asc" },
   });
-
-  function calculateThrillFactor(gap) {
-    if (gap <= 10) return 0;
-    return 6 * Math.log10(gap - 9);
+  for (const song of newSongs) {
+    song.historicalQuality = await calculateHistoricalQuality(song.id);
+    randomSongs.push(song);
   }
 
-  const shuffledSongs = songs.sort(() => 0.5 - Math.random());
-
-  for (const song of shuffledSongs) {
-    if (randomSongs.length >= numberOfSongs) break;
-
-    const latestPerformance = await prisma.ep_songperformances.findFirst({
-      where: { songid: song.id },
-      orderBy: { id: "desc" },
+  // If the playlist is not full yet, fill it with old songs
+  if (randomSongs.length < 30) {
+    const numberOfSongs = 30 - randomSongs.length;
+    const oldSongs = await prisma.ep_songs.findMany({
+      where: { id: { lt: 118 }, weighting: { not: 0 } }, // Adjust the range as needed
     });
 
-    if (!latestPerformance) continue;
+    function calculateThrillFactor(gap) {
+      if (gap <= 10) return 0;
+      return 6 * Math.log10(gap - 9);
+    }
 
-    const gap = Number(latestConcert.id) - Number(latestPerformance.showid);
-    if (gap < 4 || usedGaps.has(gap)) continue; // Skip if gap is already used
+    const shuffledSongs = oldSongs.sort(() => 0.5 - Math.random());
 
-    usedGaps.add(gap); // Add gap to the set of used gaps
-    /* console.log(
-      `Latest performance for song ID ${song.id}:`,
-      latestPerformance
-    );*/
+    for (const song of shuffledSongs) {
+      if (randomSongs.length >= 30) break;
 
-    /* console.log(
-      `Latest performance showid for song ${song.name}: ${latestPerformance.showid}`
-    ); */
+      const latestPerformance = await prisma.ep_songperformances.findFirst({
+        where: { songid: song.id },
+        orderBy: { id: "desc" },
+      });
 
-    usedGaps.add(gap); // Add gap to the set of used gaps
+      if (!latestPerformance) continue;
 
-    if (gap < 4) continue;
+      const gap = Number(latestConcert.id) - Number(latestPerformance.showid);
+      if (gap < 4 || usedGaps.has(gap)) continue; // Skip if gap is already used
 
-    if (randomSongs.some((rSong) => rSong.id === song.id)) continue;
+      usedGaps.add(gap); // Add gap to the set of used gaps
 
-    const thrillFactor = calculateThrillFactor(gap);
+      if (randomSongs.some((rSong) => rSong.id === song.id)) continue;
 
-    song.historicalQuality = await calculateHistoricalQuality(song.id);
-    song.historicalQuality += thrillFactor;
-    song.historicalQuality = Math.min(100, song.historicalQuality); // Cap at 100
-    song.gap = gap;
-    song.thrillFactor = thrillFactor; // Save this for logging
+      const thrillFactor = calculateThrillFactor(gap);
 
-    randomSongs.push(song);
+      song.historicalQuality = await calculateHistoricalQuality(song.id);
+      song.historicalQuality += thrillFactor;
+      song.historicalQuality = Math.min(100, song.historicalQuality); // Cap at 100
+      song.gap = gap;
+      song.thrillFactor = thrillFactor; // Save this for logging
+
+      randomSongs.push(song);
+    }
   }
 
   return randomSongs;
