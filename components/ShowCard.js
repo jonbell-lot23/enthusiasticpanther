@@ -125,7 +125,7 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
       <Link href={`/show/${showId}`}>
         <div className={cardStyles.linkContainer}>
           {showId <= 73 ||
-          (showId >= 150 && showId <= 235) ||
+          (showId >= 150 && showId <= 243) ||
           [74, 102, 141].includes(showId) ? (
             <img
               src={`/show-art/show${showId}.png`}
