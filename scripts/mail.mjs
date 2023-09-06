@@ -189,14 +189,22 @@ async function getRandomSongs() {
   });
   if (!latestConcert) return randomSongs;
 
-  // Fetch new songs and add them to the playlist
-  const newSongs = await prisma.ep_songs.findMany({
-    where: { id: { gte: 118, lte: 137 } }, // Adjust the range as needed
+  // Fetch all songs
+  const allSongs = await prisma.ep_songs.findMany({
     orderBy: { id: "asc" },
   });
-  for (const song of newSongs) {
-    song.historicalQuality = await calculateHistoricalQuality(song.id);
-    randomSongs.push(song);
+
+  // Prioritize songs that have not been played yet
+  for (const song of allSongs) {
+    const performances = await prisma.ep_songperformances.findMany({
+      where: { songid: song.id },
+    });
+
+    // If the song has not been played yet, add it to the playlist
+    if (performances.length === 0) {
+      song.historicalQuality = await calculateHistoricalQuality(song.id);
+      randomSongs.push(song);
+    }
   }
 
   // If the playlist is not full yet, fill it with old songs
