@@ -81,7 +81,8 @@ function Page({ data, showId, location, date }) {
 
       <div className={styles.container}>
         <div className="flex flex-col m-4 md:flex-row">
-          <div className={`${styles.albumContainer} w-full md:w-auto`}>
+          <div className={`${styles.albumContainer} w-full sm:w-1/2 md:w-auto`}>
+            {" "}
             <ShowCard showId={showId} location={location} showScore={score} />
             <div className={styles.metadata}>
               <div className={styles.metadataTitle}></div>
