@@ -5,7 +5,6 @@
 }
 
 .albumContainer {
-  width: 50%;
   max-width: 512px;
 }
 
@@ -201,16 +200,20 @@
   font-size: 12px;
 }
 
+.flex {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .flex {
+    flex-direction: row;
+  }
+}
+
 @media (max-width: 600px) {
   .grid {
     width: 100%;
     flex-direction: column;
-  }
-}
-
-@media (min-width: 768px) {
-  .container {
-  }
-  .albumContainer {
   }
 }
