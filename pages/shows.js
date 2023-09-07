@@ -25,8 +25,7 @@ export default function Home({ shows }) {
           .map((year) => (
             <div key={year}>
               <h2 className="my-4 ml-4 text-2xl font-semibold">{year}</h2>{" "}
-              {/* Year Header */}
-              <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
+              <div className="grid grid-cols-2 gap-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-8">
                 {showsByYear[year].map((show) => (
                   <ShowCard
                     showId={show.id}
