@@ -15,7 +15,7 @@
     "@next/mdx": "^12.0.10",
     "@prisma/client": "^5.1.1",
     "esm": "^3.2.25",
-    "next": "12.0.10",
+    "next": "12.1.0",
     "node-cache": "^5.1.2",
     "node-fetch": "^3.3.2",
     "prisma": "^5.1.1",
