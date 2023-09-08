@@ -211,7 +211,7 @@ async function getRandomSongs() {
   if (randomSongs.length < 30) {
     const numberOfSongs = 30 - randomSongs.length;
     const oldSongs = await prisma.ep_songs.findMany({
-      where: { id: { lt: 118 }, weighting: { not: 0 } }, // Adjust the range as needed
+      where: { id: { lt: 137 }, weighting: { not: 0 } }, // Adjust the range as needed
     });
 
     function calculateThrillFactor(gap) {
