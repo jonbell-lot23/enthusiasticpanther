@@ -10,6 +10,12 @@ function SongPage({ songDetails, performances }) {
       <h2 className="w-full my-4 text-2xl font-semibold text-left pl-7">
         {songDetails.name}
       </h2>
+
+      <div className="w-full font-medium pl-7">
+        <b>Statistics</b>
+        <p>sdfsd</p>
+      </div>
+
       <div className={styles.performancesContainer}>
         {performances &&
           performances.map((performance, index) => (

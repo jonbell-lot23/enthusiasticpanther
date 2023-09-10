@@ -32,3 +32,8 @@
   width: 15px;
   color: #ddd;
 }
+
+.songLink:hover {
+  text-decoration: underline;
+  color: #333;
+}
