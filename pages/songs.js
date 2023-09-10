@@ -116,7 +116,7 @@ function Home({ songs }) {
   );
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
   const songs = await prisma.ep_songs.findMany({
     where: {
       weighting: 100,
@@ -170,7 +170,9 @@ export async function getServerSideProps() {
     })
   );
 
-  return { props: { songs: enhancedSongs } };
+  return {
+    props: { songs: enhancedSongs },
+  };
 }
 
 export default Home;
