@@ -14,7 +14,7 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (showId <= 244) {
+    if (showId <= 255) {
       return;
     }
 
@@ -120,7 +120,7 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
     <div className={cardStyles.cardContainer}>
       <Link href={`/show/${showId}`}>
         <div className={cardStyles.linkContainer}>
-          {showId <= 244 ? (
+          {showId <= 255 ? (
             <img
               src={`/show-art/show${showId}.png`}
               alt={location}
