@@ -78,7 +78,7 @@ export default function About() {
             </a>
           </li>
         </ul>
-        <p>That should be enough to get started!</p>
+        <p>That should be enough to get started! :)</p>
       </div>
     </div>
   );
