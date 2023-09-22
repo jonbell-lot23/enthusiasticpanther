@@ -19,4 +19,3 @@ jobs:
           start: npm start
 	  				env: 
 							REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
-      
