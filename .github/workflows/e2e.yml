@@ -12,8 +12,8 @@ jobs:
         browser: replay-chromium
         build: npm run build
         start: npm start
-          env:
-            REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
+      env:
+        REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
     - name: Upload replays
       if: always()
       uses: replayio/action-upload@v0.5.1
