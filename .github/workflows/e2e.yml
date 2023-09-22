@@ -7,18 +7,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # Install NPM dependencies, cache them correctly
-      # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v5.1.0
         with:
           browser: replay-chromium
           build: npm run build
           start: npm start
-				env:
-					REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
+	  	env: 
+    			REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
 
-      # Always run this step so failed tests are uploaded
       - name: Upload replays
         if: always()
         uses: replayio/action-upload@v0.5.1
