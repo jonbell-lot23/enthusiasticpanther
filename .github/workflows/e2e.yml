@@ -5,12 +5,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
-    - name: Upload replays
-      if: always()
-      uses: replayio/action-upload@v0.5.1
-      with:
-        api-key: ${{ secrets.RECORD_REPLAY_API_KEY }}
+      uses: actions/checkout@v3    
     - name: Cypress run
       uses: cypress-io/github-action@v5.1.0
       with:
@@ -19,3 +14,8 @@ jobs:
         start: npm start
           env:
             REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
+    - name: Upload replays
+      if: always()
+      uses: replayio/action-upload@v0.5.1
+      with:
+        api-key: ${{ secrets.RECORD_REPLAY_API_KEY }}
