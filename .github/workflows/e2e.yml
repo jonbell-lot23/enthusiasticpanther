@@ -17,6 +17,6 @@ jobs:
           browser: replay-chromium
           build: npm run build
           start: npm start
-	  	      env: 
-              REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
+	  				env: 
+							REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
       
