@@ -52,8 +52,8 @@ export async function getStaticPaths() {
   return { paths, fallback: false };
 }
 
-export async function getStaticProps({ params }) {
-  const songId = Number(params.songid);
+export async function getServerSideProps(context) {
+  const songId = Number(context.params.songid);
 
   // Fetch the song performances for the given song ID
   const songPerformances = await prisma.ep_songperformances.findMany({
