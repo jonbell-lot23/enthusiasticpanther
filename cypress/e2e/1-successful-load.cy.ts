@@ -1,4 +1,4 @@
-describe('Enthusiastic Panther Website Navigation', () => {
+describe('EP navigation test', () => {
   it('should navigate through header items and ensure they load correctly', () => {
     // Go to the home page
     cy.visit('https://enthusiasticpanther.com/');
