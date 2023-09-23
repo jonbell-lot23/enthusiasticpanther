@@ -43,15 +43,6 @@ function SongPage({ songDetails, performances }) {
   );
 }
 
-export async function getStaticPaths() {
-  const songs = await prisma.ep_songs.findMany();
-  const paths = songs.map((song) => ({
-    params: { songid: song.id.toString() },
-  }));
-
-  return { paths, fallback: false };
-}
-
 export async function getServerSideProps(context) {
   const songId = Number(context.params.songid);
 
