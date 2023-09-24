@@ -2,7 +2,7 @@ name: Vercel Production Deployment
 
 env:
   VERCEL_PROJECT_ID: 'prj_ozVwIdKu1CrPRBfaJcwIFE7cjLFu' # Hardcoded project ID
-  VERCEL_ORG_ID: 'r2wDLYF4M1tUVLjCG8yWI1xs' # Hardcoded org ID
+  VERCEL_ORG_ID: 'team_dSnfxncbww1olUYH5gbmmn3d' # Hardcoded org ID
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
 on:
