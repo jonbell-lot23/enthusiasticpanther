@@ -1,4 +1,4 @@
-name: Combined Vercel Deployment and E2E Tests
+name: Deploy & Test
 
 env:
   VERCEL_PROJECT_ID: 'prj_ozVwIdKu1CrPRBfaJcwIFE7cjLFu' # Hardcoded project ID
