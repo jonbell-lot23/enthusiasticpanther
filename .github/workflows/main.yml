@@ -1,5 +1,8 @@
-name: Cypress Tests
-on: [push]
+name: Cypress Cloud
+on:
+  push:
+  schedule:
+    - cron: '0 */3 * * *'
 env:
   VERCEL_PROJECT_ID: 'prj_ozVwIdKu1CrPRBfaJcwIFE7cjLFu'
   VERCEL_ORG_ID: 'team_dSnfxncbww1olUYH5gbmmn3d'
