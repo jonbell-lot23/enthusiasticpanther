@@ -13,7 +13,6 @@
   "dependencies": {
     "@mdx-js/loader": "^2.0.0",
     "@next/mdx": "^12.0.10",
-    "@next/swc-darwin-arm64": "^13.5.4",
     "@prisma/client": "^5.1.1",
     "esm": "^3.2.25",
     "next": "12.1.0",
