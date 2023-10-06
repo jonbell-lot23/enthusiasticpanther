@@ -1,7 +1,7 @@
 describe('Enthusiastic Panther Album Art', () => {
   it('should check that the first item in "Latest shows" uses a PNG for album art', () => {
     // Go to the home page
-    cy.visit('http://localhost:3000');  // Replace with the URL of your app if needed
+    cy.visit('http://localhost:3000');
 
     // Navigate to the "Latest shows" section
     cy.contains('Latest shows').scrollIntoView();
