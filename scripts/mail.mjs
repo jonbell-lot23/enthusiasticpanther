@@ -64,6 +64,7 @@ async function getPastConcerts(prisma) {
       location: true,
       date: true,
     },
+    take: 50,
   });
   console.log(`Finished fetching past concerts`);
   return result
