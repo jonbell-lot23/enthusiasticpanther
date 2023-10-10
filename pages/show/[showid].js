@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import styles from "../../styles/Home.module.css";
 import prisma from "/prisma";
+import Subnav from "../../components/Subnav";
 
 import React, { useEffect, useRef } from "react";
 import ShowCard from "../../components/ShowCard";
@@ -80,6 +81,7 @@ function Page({ data, showId, location, date }) {
       </Head>
 
       <div className={styles.container}>
+        <Subnav showId={showId} />
         <div className="flex flex-col m-4 md:flex-row">
           <div className={`${styles.albumContainer} w-full sm:w-1/2 md:w-auto`}>
             {" "}

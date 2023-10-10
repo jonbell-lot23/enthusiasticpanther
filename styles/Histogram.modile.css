@@ -1,0 +1,15 @@
+.histogramContainer {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.bar {
+  width: 20px;
+  background-color: #0070f3;
+  transition: background-color 0.2s;
+}
+
+.bar:hover {
+  background-color: #0366d6;
+}
