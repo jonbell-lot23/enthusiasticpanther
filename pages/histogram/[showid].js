@@ -2,6 +2,9 @@ import React from "react";
 import { useRouter } from "next/router";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
+import ShowCard from "../../components/ShowCard";
+import cardStyles from "../../components/ShowCard.module.css";
+import Subnav from "../../components/Subnav";
 
 const HistogramPage = ({ songsData, showId }) => {
   console.log("Props received in HistogramPage:", { songsData, showId });
@@ -17,21 +20,15 @@ const HistogramPage = ({ songsData, showId }) => {
 
   return (
     <div>
-      <h1>Histogram for Show ID: {showId}</h1>
-
-      <h2>Album Distribution</h2>
-      {Object.entries(groupedByAlbum).map(([album, count]) => (
-        <div key={album}>
-          {album}: {count} songs
-        </div>
-      ))}
-
-      <h2>Debut Shows</h2>
-      {songsData.map((song) => (
-        <div key={song.name}>
-          {song.name || "Unknown Song"} - Debut in show: {song.debutShow}
-        </div>
-      ))}
+      <Subnav showId={showId} />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4">
+        {songsData.map((song) => (
+          <div key={song.name} className="flex flex-col items-center">
+            <div>{song.name || "Unknown Song"}</div>
+            <ShowCard showId={song.debutShow} location={`${song.debutShow}`} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -59,21 +56,11 @@ export async function getServerSideProps(context) {
 
         console.log("Fetched song:", song);
 
-        if (!song || !song.name || !song.album) {
-          console.error(
-            `Incomplete song data for song ID ${performance.songid}:`,
-            song
-          );
-          return {
-            name: song?.name || "Unknown Song", // <-- Modified this line
-            album: "",
-            debutShow: -1,
-            currentShow: showId,
-          };
-        }
+        // Assume an empty album if not provided
+        const album = song?.album || "";
 
         const previousPerformances = await prisma.ep_songperformances.findMany({
-          where: { songid: performance.songid },
+          where: { songid: performance.songid, showid: { lt: showId } }, // fetch performances before the current show
           orderBy: { showid: "asc" },
         });
 
@@ -82,9 +69,9 @@ export async function getServerSideProps(context) {
           : showId;
 
         return {
-          name: song.name,
-          album: song.album,
-          debutShow: debutShow.showid,
+          name: song?.name || "Unknown Song",
+          album: album,
+          debutShow: debutShow, // Corrected this line
           currentShow: showId,
         };
       })

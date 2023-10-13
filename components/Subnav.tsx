@@ -12,7 +12,7 @@ const Subnav: React.FC<SubnavProps> = ({ showId }) => {
       <Link href={`/show/${showId}`}>
         <a className={styles.subnavItem}>Summary</a>
       </Link>
-      <Link href={`/show/${showId}/histogram`}>
+      <Link href={`/histogram/${showId}/`}>
         <a className={styles.subnavItem}>Histogram</a>
       </Link>
     </div>
