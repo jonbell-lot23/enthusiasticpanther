@@ -3,10 +3,9 @@ import Link from "next/link";
 import styles from "../../styles/Home.module.css";
 import prisma from "/prisma";
 import Subnav from "../../components/Subnav";
-
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import ShowCard from "../../components/ShowCard";
-import cardStyles from "../../components/ShowCard.module.css"; // Import the new CSS module
+import cardStyles from "../../components/ShowCard.module.css";
 
 function Song(props) {
   // Determine the class based on quality
@@ -29,45 +28,13 @@ function Song(props) {
   );
 }
 
-function Page({ data, showId, location, date }) {
+function Page({ data, showId, location, date, footnotes }) {
   // Parse the date to the desired format
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
-
-  // Collect footnotes for debuts and gaps
-  let footnotes = [];
-  let debutFootnoteIndices = [];
-  let footnoteCounter = 0;
-
-  const songs = data.map((song, index) => {
-    let footnoteIndex = null;
-    if (song.isDebut) {
-      footnoteIndex = ++footnoteCounter;
-      debutFootnoteIndices.push(footnoteIndex);
-    } else if (song.gap > 15) {
-      footnoteIndex = ++footnoteCounter;
-      footnotes.push(
-        `[${footnoteIndex}] First performance in ${song.gap} shows`
-      );
-    }
-    return (
-      <Song
-        key={index}
-        name={song.name}
-        quality={song.quality}
-        footnoteIndex={footnoteIndex}
-        songId={song.id} // Pass songId as a prop
-      />
-    );
-  });
-
-  // Combine debut footnotes into a single line
-  if (debutFootnoteIndices.length > 0) {
-    footnotes.push(`[${debutFootnoteIndices.join(", ")}] Debut`);
-  }
 
   let score = Math.floor(
     data.reduce((sum, song) => sum + song.quality, 0) / data.length
@@ -95,7 +62,17 @@ function Page({ data, showId, location, date }) {
               <h2 className={styles.locationHeader}>{location}</h2>
               <h3 className={styles.dateSubheader}>{formattedDate}</h3>
               <h2 className={styles.locationHeader}>Setlist</h2>
-              <div className="app">{songs}</div>
+              <div className="app">
+                {data.map((song, index) => (
+                  <Song
+                    key={index}
+                    name={song.name}
+                    quality={song.quality}
+                    footnoteIndex={song.footnoteIndex}
+                    songId={song.id}
+                  />
+                ))}
+              </div>
 
               {footnotes.length > 0 && (
                 <>
@@ -115,8 +92,26 @@ function Page({ data, showId, location, date }) {
   );
 }
 
-export async function getServerSideProps(context) {
-  const showId = Number(context.params.showid);
+export async function getStaticPaths() {
+  // Fetch the most recent 100 show IDs from your database
+  const recentShows = await prisma.ep_shows.findMany({
+    take: 100,
+    orderBy: { id: "desc" }, // Assuming your IDs are in descending order
+  });
+
+  // Generate paths for these show IDs
+  const paths = recentShows.map((show) => ({
+    params: { showid: show.id.toString() },
+  }));
+
+  return {
+    paths,
+    fallback: false, // Render 404 for paths not found
+  };
+}
+
+export async function getStaticProps({ params }) {
+  const showId = Number(params.showid);
 
   const showDetails = await prisma.ep_shows.findUnique({
     where: { id: showId },
@@ -125,7 +120,7 @@ export async function getServerSideProps(context) {
   // Fetch the song performances for the given show ID
   const performances = await prisma.ep_songperformances.findMany({
     where: { showid: showId },
-    orderBy: { showid: "asc" }, // Order by show ID to calculate the gap
+    orderBy: { showid: "asc" },
   });
 
   // Map the performances into the desired format for the page
@@ -155,6 +150,30 @@ export async function getServerSideProps(context) {
     })
   );
 
+  // Collect footnotes for debuts and gaps
+  let footnotes = [];
+  let debutFootnoteIndices = [];
+  let footnoteCounter = 0;
+
+  data.forEach((song) => {
+    let footnoteIndex = null;
+    if (song.isDebut) {
+      footnoteIndex = ++footnoteCounter;
+      debutFootnoteIndices.push(footnoteIndex);
+    } else if (song.gap > 15) {
+      footnoteIndex = ++footnoteCounter;
+      footnotes.push(
+        `[${footnoteIndex}] First performance in ${song.gap} shows`
+      );
+    }
+    song.footnoteIndex = footnoteIndex;
+  });
+
+  // Combine debut footnotes into a single line
+  if (debutFootnoteIndices.length > 0) {
+    footnotes.push(`[${debutFootnoteIndices.join(", ")}] Debut`);
+  }
+
   await prisma.$disconnect();
 
   return {
@@ -163,6 +182,7 @@ export async function getServerSideProps(context) {
       showId,
       location: showDetails.location,
       date: showDetails.date,
+      footnotes,
     },
   };
 }
