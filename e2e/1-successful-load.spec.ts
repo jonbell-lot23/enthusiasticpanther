@@ -1,8 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-// I hope this works
 const isProduction = process.env.NODE_ENV === 'production';
-const BASE_URL = isProduction ? 'https://enthusiasticpanther.com' : 'https://enthusiasticpanther.com';
+const BASE_URL = isProduction ? 'https://enthusiasticpanther.com' : 'http://localhost:3000';
 
 test('test', async ({ page }) => {
   await page.goto(BASE_URL);
