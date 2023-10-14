@@ -36,9 +36,14 @@ function Page({ data, showId, location, date, footnotes }) {
     year: "numeric",
   });
 
-  let score = Math.floor(
-    data.reduce((sum, song) => sum + song.quality, 0) / data.length
-  );
+  let score = 0; // Initialize score to 0
+
+  if (data && data.length > 0) {
+    // Check if data is defined and has elements
+    score = Math.floor(
+      data.reduce((sum, song) => sum + song.quality, 0) / data.length
+    );
+  }
 
   return (
     <>
@@ -63,15 +68,14 @@ function Page({ data, showId, location, date, footnotes }) {
               <h3 className={styles.dateSubheader}>{formattedDate}</h3>
               <h2 className={styles.locationHeader}>Setlist</h2>
               <div className="app">
-                {data.map((song, index) => (
-                  <Song
-                    key={index}
-                    name={song.name}
-                    quality={song.quality}
-                    footnoteIndex={song.footnoteIndex}
-                    songId={song.id}
-                  />
-                ))}
+                {data && Array.isArray(data) ? (
+                  data.map((song, index) => (
+                    <Song key={index} name={song.name} />
+                  ))
+                ) : (
+                  // Handle the case where data is undefined or not an array
+                  <p>No setlist data available</p>
+                )}
               </div>
 
               {footnotes.length > 0 && (

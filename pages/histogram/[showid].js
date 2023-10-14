@@ -6,10 +6,10 @@ import Subnav from "../../components/Subnav";
 
 const HistogramPage = ({ songsData, showId }) => {
   const eras = [
-    { era: 1, start: 1, end: 14 },
+    { era: 1, start: 0, end: 14 },
     { era: 2, start: 15, end: 30 }, // the missoula show
-    { era: 3, start: 31, end: 60 },
-    { era: 4, start: 61, end: 232 },
+    { era: 3, start: 31, end: 183 },
+    { era: 4, start: 183, end: 232 },
     { era: 5, start: 233, end: 300 }, // "maybe this" album (NYC)
   ];
 
