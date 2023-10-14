@@ -106,7 +106,7 @@ export async function getStaticPaths() {
 
   return {
     paths,
-    fallback: false, // Render 404 for paths not found
+    fallback: true, // Render 404 for paths not found
   };
 }
 

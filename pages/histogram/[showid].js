@@ -2,30 +2,47 @@ import React from "react";
 import { useRouter } from "next/router";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
-import ShowCard from "../../components/ShowCard";
-import cardStyles from "../../components/ShowCard.module.css";
 import Subnav from "../../components/Subnav";
 
 const HistogramPage = ({ songsData, showId }) => {
+  const eras = [
+    { era: 1, start: 1, end: 14 },
+    { era: 2, start: 15, end: 30 }, // the missoula show
+    { era: 3, start: 31, end: 60 },
+    { era: 4, start: 61, end: 232 },
+    { era: 5, start: 233, end: 300 }, // "maybe this" album (NYC)
+  ];
+
   console.log("Props received in HistogramPage:", { songsData, showId });
 
   if (!songsData) {
     return <div>Error: Song data is not available.</div>;
   }
 
-  const groupedByAlbum = songsData.reduce((acc, song) => {
-    acc[song.album] = (acc[song.album] || 0) + 1;
+  const groupedByEra = eras.reduce((acc, era) => {
+    acc[era.era] = { count: 0, shows: [], debutDates: [] };
     return acc;
   }, {});
+
+  songsData.forEach((song) => {
+    const era = eras.find(
+      (era) => song.debutShow >= era.start && song.debutShow <= era.end
+    );
+    if (era) {
+      groupedByEra[era.era].count += 1;
+      groupedByEra[era.era].shows.push(song.currentShow);
+      groupedByEra[era.era].debutDates.push(song.debutShow);
+    }
+  });
 
   return (
     <div>
       <Subnav showId={showId} />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:grid-cols-4">
-        {songsData.map((song) => (
-          <div key={song.name} className="flex flex-col items-center">
-            <div>{song.name || "Unknown Song"}</div>
-            <ShowCard showId={song.debutShow} location={`${song.debutShow}`} />
+      <div className="w-full max-w-2xl p-4 mx-auto prose prose-lg bg-white rounded-lg shadow-lg">
+        {eras.map((era) => (
+          <div key={era.era}>
+            Era {era.era}: {groupedByEra[era.era].count} (
+            {groupedByEra[era.era].debutDates.join(", ")})
           </div>
         ))}
       </div>
