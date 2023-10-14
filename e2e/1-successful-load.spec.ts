@@ -6,7 +6,6 @@ const BASE_URL = isProduction ? 'https://enthusiasticpanther.com' : 'http://loca
 
 test('test', async ({ page }) => {
   await page.goto(BASE_URL);
-  await page.goto('http://localhost:3000/');
   await page.waitForSelector('text="Latest shows"');
   await page.waitForSelector('text="Highly rated shows"');
 
