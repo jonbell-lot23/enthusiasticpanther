@@ -62,8 +62,12 @@ jobs:
         run: npm ci
       - name: Install Playwright
         run: npm install playwright
+      - name: Debug node_modules
+        run: ls node_modules/.bin
       - name: Install Chromium for Playwright
-        run: npx playwright install chromium
+        run: ./node_modules/.bin/playwright install chromium
+      - name: Run Playwright tests
+        run: ./node_modules/.bin/playwright test
       - name: Run Playwright tests
         run: npx playwright test
       - uses: actions/upload-artifact@v3
