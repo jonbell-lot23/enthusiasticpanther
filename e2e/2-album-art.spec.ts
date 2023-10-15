@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction == true;
 const BASE_URL = isProduction ? 'https://enthusiasticpanther.com' : 'http://localhost:3000';
 
 test('album test', async ({ page }) => {
