@@ -17,7 +17,7 @@ env:
   REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
 
 jobs:
-  test:
+  Playwright:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -38,7 +38,7 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-  Deploy-Production:
+  Vercel:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -51,7 +51,7 @@ jobs:
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --prod --token=${{ env.VERCEL_TOKEN }}
 
-  cypress-run:
+  Cypress:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
