@@ -18,7 +18,39 @@ on:
   workflow_dispatch:
 
 jobs:
-  test: # Playwright Tests
+  Vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ env.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ env.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ env.VERCEL_TOKEN }}
+
+  Cypress:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cypress run
+        uses: cypress-io/github-action@v5.1.0
+        with:
+          browser: replay-chromium
+          build: npm run build
+          start: npm start
+        env:
+          REPLAY_API_KEY: ${{ env.REPLAY_API_KEY }}
+      - name: Upload replays
+        if: always()
+        uses: replayio/action-upload@v0.5.1
+        with:
+          api-key: ${{ env.REPLAY_API_KEY }}
+
+  Playwright:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -38,35 +70,3 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-
-  Deploy-Production: # Existing Deploy-Production job
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Vercel CLI
-        run: npm install --global vercel@latest
-      - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=production --token=${{ env.VERCEL_TOKEN }}
-      - name: Build Project Artifacts
-        run: vercel build --prod --token=${{ env.VERCEL_TOKEN }}
-      - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --prod --token=${{ env.VERCEL_TOKEN }}
-
-  cypress-run: # Existing cypress-run job
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Cypress run
-        uses: cypress-io/github-action@v5.1.0
-        with:
-          browser: replay-chromium
-          build: npm run build
-          start: npm start
-        env:
-          REPLAY_API_KEY: ${{ env.REPLAY_API_KEY }}
-      - name: Upload replays
-        if: always()
-        uses: replayio/action-upload@v0.5.1
-        with:
-          api-key: ${{ env.REPLAY_API_KEY }}
