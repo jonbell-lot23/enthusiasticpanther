@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import Subnav from "../../components/Subnav";
 import { Bar } from "react-chartjs-2";
 import "chart.js/auto";
+
 const prisma = new PrismaClient();
 
 const HistogramPage = ({ songsData, showId }) => {
@@ -90,57 +91,66 @@ const HistogramPage = ({ songsData, showId }) => {
   );
 };
 
-export async function getServerSideProps(context) {
-  try {
-    const showId = Number(context.params.showid);
+export async function getStaticProps(context) {
+  const showId = Number(context.params.showid);
+  const performances = await prisma.ep_songperformances.findMany({
+    where: { showid: showId },
+  });
 
-    const performances = await prisma.ep_songperformances.findMany({
-      where: { showid: showId },
-    });
-
-    if (!performances) {
-      console.error("Error fetching performances.");
-      return { props: { songsData: [], showId: null } };
-    }
-
-    const songsData = await Promise.all(
-      performances.map(async (performance) => {
-        const song = await prisma.ep_songs.findUnique({
-          where: { id: performance.songid },
-        });
-
-        const album = song?.album || "";
-
-        const previousPerformances = await prisma.ep_songperformances.findMany({
-          where: { songid: performance.songid, showid: { lt: showId } },
-          orderBy: { showid: "asc" },
-        });
-
-        const debutShow = previousPerformances.length
-          ? previousPerformances[0].showid
-          : showId;
-
-        return {
-          name: song?.name || "Unknown Song",
-          album: album,
-          debutShow: debutShow,
-          currentShow: showId,
-        };
-      })
-    );
-
-    await prisma.$disconnect();
-
-    return {
-      props: {
-        songsData,
-        showId,
-      },
-    };
-  } catch (error) {
-    console.error("An error occurred during data fetching:", error);
+  if (!performances) {
+    console.error("Error fetching performances.");
     return { props: { songsData: [], showId: null } };
   }
+
+  const songsData = await Promise.all(
+    performances.map(async (performance) => {
+      const song = await prisma.ep_songs.findUnique({
+        where: { id: performance.songid },
+      });
+      const album = song?.album || "";
+      const previousPerformances = await prisma.ep_songperformances.findMany({
+        where: { songid: performance.songid, showid: { lt: showId } },
+        orderBy: { showid: "asc" },
+      });
+      const debutShow = previousPerformances.length
+        ? previousPerformances[0].showid
+        : showId;
+
+      return {
+        name: song?.name || "Unknown Song",
+        album: album,
+        debutShow: debutShow,
+        currentShow: showId,
+      };
+    })
+  );
+
+  await prisma.$disconnect();
+
+  return {
+    props: {
+      songsData,
+      showId,
+    },
+  };
+}
+
+export async function getStaticPaths() {
+  const allShows = await prisma.ep_shows.findMany({
+    select: {
+      id: true,
+    },
+  });
+  const paths = allShows.map((show) => ({
+    params: { showid: show.id.toString() },
+  }));
+
+  await prisma.$disconnect();
+
+  return {
+    paths,
+    fallback: false,
+  };
 }
 
 export default HistogramPage;
