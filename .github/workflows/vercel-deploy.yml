@@ -1,12 +1,4 @@
-name: Deploy & Test (EP)
-
-env:
-  VERCEL_PROJECT_ID: "prj_ozVwIdKu1CrPRBfaJcwIFE7cjLFu" # Hardcoded project ID
-  VERCEL_ORG_ID: "team_dSnfxncbww1olUYH5gbmmn3d" # Hardcoded org ID
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
-  NODE_ENV: "production"
+name: Combined Workflow
 
 on:
   push:
@@ -17,8 +9,36 @@ on:
     - cron: "5 17 * * *" # Every day at 5:05 AM NZ
   workflow_dispatch:
 
+env:
+  VERCEL_PROJECT_ID: "prj_ozVwIdKu1CrPRBfaJcwIFE7cjLFu" # Hardcoded project ID
+  VERCEL_ORG_ID: "team_dSnfxncbww1olUYH5gbmmn3d" # Hardcoded org ID
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
+
 jobs:
-  Vercel:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  Deploy-Production:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -31,7 +51,7 @@ jobs:
       - name: Deploy Project Artifacts to Vercel
         run: vercel deploy --prebuilt --prod --token=${{ env.VERCEL_TOKEN }}
 
-  Cypress:
+  cypress-run:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -49,30 +69,3 @@ jobs:
         uses: replayio/action-upload@v0.5.1
         with:
           api-key: ${{ env.REPLAY_API_KEY }}
-
-  Playwright:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Install dependencies
-        run: npm ci
-      - name: Install Playwright
-        run: npm install playwright
-      - name: Debug node_modules
-        run: ls node_modules/.bin
-      - name: Install Chromium for Playwright
-        run: ./node_modules/.bin/playwright install chromium
-      - name: Run Playwright tests
-        run: ./node_modules/.bin/playwright test
-      - name: Run Playwright tests
-        run: npx playwright test
-      - uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
