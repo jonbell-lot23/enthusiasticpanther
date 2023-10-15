@@ -7,10 +7,15 @@ import Subnav from "../../components/Subnav";
 const HistogramPage = ({ songsData, showId }) => {
   const eras = [
     { era: 1, start: 0, end: 14 },
-    { era: 2, start: 15, end: 30 }, // the missoula show
-    { era: 3, start: 31, end: 183 },
-    { era: 4, start: 183, end: 232 },
-    { era: 5, start: 233, end: 300 }, // "maybe this" album (NYC)
+    { era: 2, start: 15, end: 26 }, // the missoula show
+    { era: 3, start: 27, end: 53 }, // the halifax show
+    { era: 4, start: 54, end: 57 }, // the tel-aviv show
+    { era: 5, start: 58, end: 59 }, // the kyoto show
+    { era: 6, start: 60, end: 101 }, // the tokyo show
+    { era: 7, start: 102, end: 121 }, // the el paso show
+    { era: 8, start: 122, end: 182 }, // the winston-salem show
+    { era: 9, start: 183, end: 232 }, // the charlotte show
+    { era: 10, start: 233, end: 300 }, // the new york show
   ];
 
   console.log("Props received in HistogramPage:", { songsData, showId });
