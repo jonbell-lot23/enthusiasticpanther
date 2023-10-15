@@ -1,12 +1,4 @@
 name: Playwright
-
-env:
-  VERCEL_PROJECT_ID: "prj_ozVwIdKu1CrPRBfaJcwIFE7cjLFu" # Hardcoded project ID
-  VERCEL_ORG_ID: "team_dSnfxncbww1olUYH5gbmmn3d" # Hardcoded org ID
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  REPLAY_API_KEY: ${{ secrets.RECORD_REPLAY_API_KEY }}
-  NODE_ENV: "production"
 on:
   push:
     branches: [main, master]
