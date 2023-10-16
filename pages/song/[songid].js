@@ -42,7 +42,6 @@ function SongPage({ songDetails, performances }) {
 }
 
 export async function getServerSideProps(context) {
-export async function getStaticProps(context) {
   const songId = Number(context.params.songid);
 
   // Fetch the song performances for the given song ID
@@ -65,7 +64,8 @@ export async function getStaticProps(context) {
     if (previousShowId) {
       const gap = previousShowId - performance.showid;
       performances.push({
-@@ -71,7 +61,6 @@ export async function getServerSideProps(context) {
+        type: "gap",
+        gap,
       });
     }
 
@@ -84,25 +84,6 @@ export async function getStaticProps(context) {
     where: { id: songId },
   });
   return { props: { songDetails, performances } };
-}
-
-export async function getStaticPaths() {
-  const allSongs = await prisma.ep_songs.findMany({
-    select: {
-      id: true,
-    },
-  });
-
-  const paths = allSongs.map((song) => ({
-    params: { songid: song.id.toString() },
-  }));
-
-  await prisma.$disconnect();
-
-  return {
-    paths,
-    fallback: false,
-  };
 }
 
 export default SongPage;
