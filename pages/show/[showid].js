@@ -6,17 +6,16 @@ import Subnav from "../../components/Subnav";
 
 import React, { useEffect, useRef } from "react";
 import ShowCard from "../../components/ShowCard";
-import cardStyles from "../../components/ShowCard.module.css"; // Import the new CSS module
 import cardStyles from "../../components/ShowCard.module.css";
 
 function Song(props) {
-  // Determine the class based on quality
   let qualityClass =
     props.quality > 73
       ? cardStyles.excellent
       : props.quality < 40
       ? cardStyles.poor
       : "";
+
   return (
     <div className={`${cardStyles.songContainer} ${qualityClass}`}>
       <div className={cardStyles.songTitle}>
@@ -30,17 +29,16 @@ function Song(props) {
 }
 
 function Page({ data, showId, location, date }) {
-  // Parse the date to the desired format
   const formattedDate = new Date(date).toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
 
-  // Collect footnotes for debuts and gaps
   let footnotes = [];
   let debutFootnoteIndices = [];
   let footnoteCounter = 0;
+
   const songs = data.map((song, index) => {
     let footnoteIndex = null;
     if (song.isDebut) {
@@ -58,30 +56,30 @@ function Page({ data, showId, location, date }) {
         name={song.name}
         quality={song.quality}
         footnoteIndex={footnoteIndex}
-        songId={song.id} // Pass songId as a prop
         songId={song.id}
       />
     );
   });
 
-  // Combine debut footnotes into a single line
   if (debutFootnoteIndices.length > 0) {
     footnotes.push(`[${debutFootnoteIndices.join(", ")}] Debut`);
   }
+
   let score = Math.floor(
     data.reduce((sum, song) => sum + song.quality, 0) / data.length
   );
+
   return (
     <>
       <Head>
         <title>Enthusiastic Shows</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <div className={styles.container}>
         <Subnav showId={showId} />
         <div className="flex flex-col m-4 md:flex-row">
           <div className={`${styles.albumContainer} w-full sm:w-1/2 md:w-auto`}>
-            {" "}
             <ShowCard showId={showId} location={location} showScore={score} />
             <div className={styles.metadata}>
               <div className={styles.metadataTitle}></div>
@@ -93,6 +91,7 @@ function Page({ data, showId, location, date }) {
               <h3 className={styles.dateSubheader}>{formattedDate}</h3>
               <h2 className={styles.locationHeader}>Setlist</h2>
               <div className="app">{songs}</div>
+
               {footnotes.length > 0 && (
                 <>
                   <h2 className={styles.shownotesHeader}>Show notes</h2>
@@ -111,36 +110,31 @@ function Page({ data, showId, location, date }) {
   );
 }
 
-export async function getServerSideProps(context) {
 export async function getStaticProps(context) {
   const showId = Number(context.params.showid);
-
   const showDetails = await prisma.ep_shows.findUnique({
     where: { id: showId },
   });
 
-  // Fetch the song performances for the given show ID
   const performances = await prisma.ep_songperformances.findMany({
     where: { showid: showId },
-    orderBy: { showid: "asc" }, // Order by show ID to calculate the gap
     orderBy: { showid: "asc" },
   });
 
-  // Map the performances into the desired format for the page
   const data = await Promise.all(
     performances.map(async (performance) => {
-      // Fetch song details for each performance
       const song = await prisma.ep_songs.findUnique({
         where: { id: performance.songid },
       });
 
-      // Determine if it's a debut and calculate the gap
       const previousPerformances = await prisma.ep_songperformances.findMany({
         where: { songid: performance.songid, showid: { lt: showId } },
         orderBy: { showid: "desc" },
       });
+
       const isDebut = previousPerformances.length === 0;
       const gap = isDebut ? 0 : showId - previousPerformances[0].showid - 1;
+
       return {
         name: song.name,
         quality: performance.quality,
@@ -150,7 +144,9 @@ export async function getStaticProps(context) {
       };
     })
   );
+
   await prisma.$disconnect();
+
   return {
     props: {
       data,
