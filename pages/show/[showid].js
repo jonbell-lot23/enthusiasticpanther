@@ -110,7 +110,7 @@ function Page({ data, showId, location, date }) {
   );
 }
 
-export async function getServerSideProps(context) {
+export async function getStaticProps(context) {
   const showId = Number(context.params.showid);
   const showDetails = await prisma.ep_shows.findUnique({
     where: { id: showId },
@@ -145,8 +145,6 @@ export async function getServerSideProps(context) {
     })
   );
 
-  await prisma.$disconnect();
-
   return {
     props: {
       data,
@@ -154,6 +152,7 @@ export async function getServerSideProps(context) {
       location: showDetails.location,
       date: showDetails.date,
     },
+    revalidate: 60 * 60 * 48, // Cache for 24 hours
   };
 }
 
