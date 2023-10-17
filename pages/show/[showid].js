@@ -110,7 +110,7 @@ function Page({ data, showId, location, date }) {
   );
 }
 
-export async function getStaticProps(context) {
+export async function getServerSideProps(context) {
   const showId = Number(context.params.showid);
   const showDetails = await prisma.ep_shows.findUnique({
     where: { id: showId },
@@ -154,25 +154,6 @@ export async function getStaticProps(context) {
       location: showDetails.location,
       date: showDetails.date,
     },
-  };
-}
-
-export async function getStaticPaths() {
-  const allShows = await prisma.ep_shows.findMany({
-    select: {
-      id: true,
-    },
-  });
-
-  const paths = allShows.map((show) => ({
-    params: { showid: show.id.toString() },
-  }));
-
-  await prisma.$disconnect();
-
-  return {
-    paths,
-    fallback: false,
   };
 }
 
