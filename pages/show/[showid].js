@@ -156,4 +156,23 @@ export async function getStaticProps(context) {
   };
 }
 
+export async function getStaticPaths() {
+  // Fetch all the show IDs from your database
+  const shows = await prisma.ep_shows.findMany({
+    select: {
+      id: true,
+    },
+  });
+
+  // Create an array of paths for the static site generation
+  const paths = shows.map((show) => ({
+    params: { showid: show.id.toString() },
+  }));
+
+  return {
+    paths,
+    fallback: false, // This means that any other routes will result in a 404 page
+  };
+}
+
 export default Page;
