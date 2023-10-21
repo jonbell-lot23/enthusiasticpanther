@@ -3,10 +3,12 @@ import Link from "next/link";
 import styles from "../../styles/Home.module.css";
 import prisma from "/prisma";
 import Subnav from "../../components/Subnav";
+import NodeCache from "node-cache";
 
 import React, { useEffect, useRef } from "react";
 import ShowCard from "../../components/ShowCard";
 import cardStyles from "../../components/ShowCard.module.css";
+const myCache = new NodeCache({ stdTTL: 0 }); // 0 means no expiration time
 
 function Song(props) {
   let qualityClass =
@@ -114,6 +116,18 @@ function Page({ data, showId, location, date }) {
 
 export async function getServerSideProps(context) {
   const showId = Number(context.params.showid);
+
+  // Create a cache key based on showId
+  const cacheKey = `show-${showId}`;
+
+  // Try to get data from cache
+  let cachedData = myCache.get(cacheKey);
+
+  if (cachedData) {
+    // If cached, return the cached data
+    return { props: cachedData };
+  }
+
   const showDetails = await prisma.ep_shows.findUnique({
     where: { id: showId },
   });
@@ -147,13 +161,16 @@ export async function getServerSideProps(context) {
     })
   );
 
+  const dataToCache = {
+    data,
+    showId,
+    location: showDetails.location,
+    date: showDetails.date,
+  };
+  myCache.set(cacheKey, dataToCache);
+
   return {
-    props: {
-      data,
-      showId,
-      location: showDetails.location,
-      date: showDetails.date,
-    },
+    props: dataToCache,
   };
 }
 
