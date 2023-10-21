@@ -11,7 +11,7 @@ export default function Home({ latestShows, highlyRatedShows }) {
       <main className="container p-4 mx-auto">
         <section className="mb-12">
           <h2 className="pl-4 mb-4 text-xl font-bold">Latest shows</h2>
-          <div className="grid grid-cols-2 gap-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-8">
+          <div className="grid grid-cols-2 gap-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4">
             {latestShows &&
               latestShows.map((show) => (
                 <ShowCard

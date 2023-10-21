@@ -110,7 +110,9 @@ function Page({ data, showId, location, date }) {
   );
 }
 
-export async function getStaticProps(context) {
+// ... (the rest of the import statements and components remain unchanged)
+
+export async function getServerSideProps(context) {
   const showId = Number(context.params.showid);
   const showDetails = await prisma.ep_shows.findUnique({
     where: { id: showId },
@@ -152,27 +154,9 @@ export async function getStaticProps(context) {
       location: showDetails.location,
       date: showDetails.date,
     },
-    revalidate: 60 * 60 * 48, // Cache for 24 hours
   };
 }
 
-export async function getStaticPaths() {
-  // Fetch all the show IDs from your database
-  const shows = await prisma.ep_shows.findMany({
-    select: {
-      id: true,
-    },
-  });
-
-  // Create an array of paths for the static site generation
-  const paths = shows.map((show) => ({
-    params: { showid: show.id.toString() },
-  }));
-
-  return {
-    paths,
-    fallback: false, // This means that any other routes will result in a 404 page
-  };
-}
+// No getStaticPaths function as it's not needed for server-side rendering
 
 export default Page;
