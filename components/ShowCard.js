@@ -120,7 +120,7 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
     <div className={cardStyles.cardContainer}>
       <Link href={`/show/${showId}`}>
         <div className={cardStyles.linkContainer}>
-          {showId <= 322 ? (
+          {showId <= 324 ? (
             <img
               src={`/show-art/show${showId}.png`}
               alt={location}
