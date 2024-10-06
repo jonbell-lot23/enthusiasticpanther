@@ -58,7 +58,7 @@ async function getPastConcerts(prisma) {
   console.log(`Fetching past concerts`);
   const result = await prisma.ep_shows.findMany({
     orderBy: {
-      date: "asc",
+      date: "desc",
     },
     select: {
       location: true,
@@ -74,10 +74,10 @@ async function getPastConcerts(prisma) {
 
 async function getCity(nextCityQuery) {
   const instructions =
-    "You are a helpful assistant that helps the band decide where to go next on a tour. The next city should be geographically close to the previous one in the given list of cities. If you've recently left a country, don't return to it. Attempt to create a straight path between cities, rather than going south only to go north again. Avoid suggesting cities that are on different continents or extremely far apart. Please suggest the next city for the tour in the format <City>, <Country>. Never send any information other than that format. For example, San Diego, USA is a good answer. But 'based on your guidelines, I think San Diego, USA is the next stop in your tour' is a bad answer.";
+    "You are an assistant tasked with selecting the next city for the band's tour. Choose a city that is geographically close to the last visited city in the provided list. Avoid returning to a country immediately after leaving it. Aim to create a logical, straight path between cities, avoiding unnecessary detours. Do not suggest cities on different continents or those that are extremely distant. Provide your suggestion in the format: <City>, <Country>. Only respond with the city and country in this format, without additional commentary.";
 
   const requestBody = {
-    model: "gpt-3.5-turbo",
+    model: "gpt-4-turbo",
     messages: [
       { role: "system", content: instructions },
       { role: "user", content: nextCityQuery },
@@ -118,7 +118,7 @@ async function createNewShow() {
     const pastConcertsList = await getPastConcerts(prisma);
 
     // Query for the next city
-    const nextCityQuery = `These are the venues I've traveled to so far, from oldest to newest. Please suggest a new city to plan in. Don't repeat cities I've been to recently, and if I've recently switched countries, don't return to the previous country until I've visited the rest of the world first. ${pastConcertsList}`;
+    const nextCityQuery = `These are the venues I've traveled to so far, from newest to oldest. Please suggest a new city to plan in. Don't repeat cities I've been to recently, and if I've recently switched countries, don't return to the previous country until I've visited the rest of the world first. ${pastConcertsList}`;
     const nextCity = await getCity(nextCityQuery);
 
     // Get the maximum existing ID
@@ -137,6 +137,7 @@ async function createNewShow() {
 
     // Insert the new show using the next city and date
     console.log(`Creating new show in: ${nextCity} on ${currentDate}`);
+    
     const result = await prisma.ep_shows.create({
       data: {
         id: newId,
@@ -144,6 +145,7 @@ async function createNewShow() {
         date: currentDate, // Add the date here
       },
     });
+    
     console.log(
       `Finished creating new show: ${result.location} on ${result.date}`
     );
@@ -303,6 +305,7 @@ async function main() {
     `Quality score for show ID ${newShow.id} updated to ${averagePerformanceScore}`
   );
 
+  
   try {
     await sendPlaylistByEmail(songs);
     console.log("Playlist email sent successfully!");
@@ -310,6 +313,7 @@ async function main() {
     console.error("An error occurred:", err);
     process.exit(1);
   }
+  
 }
 
 main()
