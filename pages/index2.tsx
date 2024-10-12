@@ -11,42 +11,35 @@ export default function HelloWorldPage({ latestShows, highlyRatedShows, latestSe
       <BandLayout 
         latestShows={latestShows} 
         highlyRatedShows={highlyRatedShows}
-        latestSetlist={latestSetlist} // Pass setlist data to the component
+        latestSetlist={latestSetlist}
       />
     </div>
   );
 }
 
 export async function getServerSideProps() {
-  // Fetch latest shows if not cached
-  let latestShows = cache.get("latestShows");
-  if (!latestShows) {
-    latestShows = await prisma.ep_shows.findMany({
+  // Fetch latest shows and top 20 shows by quality if not cached
+  const [latestShows, top20Shows] = await Promise.all([
+    cache.get("latestShows") || prisma.ep_shows.findMany({
       orderBy: { id: "desc" },
       take: 10,
-    });
-    cache.set("latestShows", latestShows);
-  }
-
-  // Fetch the top 20 shows by quality if not cached
-  let top20Shows = cache.get("top20Shows");
-  if (!top20Shows) {
-    top20Shows = await prisma.ep_shows.findMany({
+    }).then(shows => {
+      cache.set("latestShows", shows);
+      return shows;
+    }),
+    cache.get("top20Shows") || prisma.ep_shows.findMany({
       orderBy: { quality: "desc" },
       take: 20,
-    });
-    cache.set("top20Shows", top20Shows);
-  }
+    }).then(shows => {
+      cache.set("top20Shows", shows);
+      return shows;
+    })
+  ]);
 
-// Ensure top20Shows is an array before sorting
-let highlyRatedShows = []; // Initialize highlyRatedShows outside the if-else scope
-if (Array.isArray(top20Shows)) {
-  // Shuffle the top 20 shows
-  const shuffledTop20Shows = top20Shows.sort(() => 0.5 - Math.random());
-
-  // Take the first 9 from the shuffled list
-  highlyRatedShows = shuffledTop20Shows.slice(0, 9);
-}
+  // Shuffle the top 20 shows and take the first 9
+  const highlyRatedShows = Array.isArray(top20Shows)
+    ? top20Shows.sort(() => 0.5 - Math.random()).slice(0, 9)
+    : [];
 
   // Fetch the latest show’s setlist
   const latestShow = latestShows[0];
