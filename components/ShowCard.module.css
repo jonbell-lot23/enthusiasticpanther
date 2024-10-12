@@ -1,33 +1,27 @@
 .cardContainer,
 .gapContainer {
-  padding: 0.5rem;
+  padding: 0.1rem;
 }
 
 .gapSpacer {
-  width: 30px;
-  height: 30px;
+  width: 5px;
+  height: 5px;
 }
 
 .linkContainer {
   position: relative;
   background-color: white;
   border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  transition: box-shadow 0.3s ease;
 }
 
 .linkContainer:hover {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
 }
 
 .imageContainer {
   object-fit: cover;
   width: 100%;
   height: 100%;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
 }
 
 .infoContainer {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import styles from "/styles/Home.module.css"; // Import the styles
 import cardStyles from "./ShowCard.module.css"; // Import the new CSS module
 
-function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
+function ShowCard({ showId, location, imageSize = "h-full", showScore, date }) {
   let qualityClass =
     showScore > 70
       ? cardStyles.excellent
@@ -116,11 +116,32 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   }, [showId]);
 
+  // Extract city from location
+  const city = location.split(",")[0];
+
   return (
     <div className={cardStyles.cardContainer}>
       <Link href={`/show/${showId}`}>
         <div className={cardStyles.linkContainer}>
-          {showId <= 324 ? (
+          <div
+            className={cardStyles.locationText}
+            style={{
+              position: "absolute",
+              top: "0",
+              left: "0",
+              width: "100%",
+              padding: "0.2rem",
+              backgroundColor: "black",
+              color: "white",
+              fontWeight: "bold",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <span style={{ textAlign: "left" }}>{city}</span>
+            <span style={{ textAlign: "right", fontSize: "0.75rem" }}>{date}</span>
+          </div>
+          {showId <= 327 ? (
             <img
               src={`/show-art/show${showId}.png`}
               alt={location}
@@ -129,12 +150,6 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore }) {
           ) : (
             <canvas ref={canvasRef} className={cardStyles.imageContainer} />
           )}
-          <div className={cardStyles.infoContainer}>
-            <div className={cardStyles.locationText}>{location}</div>
-            <div className={`${cardStyles.scoreText} ${qualityClass}`}>
-              {showScore}
-            </div>
-          </div>
         </div>
       </Link>
     </div>
