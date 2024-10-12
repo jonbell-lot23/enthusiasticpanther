@@ -117,62 +117,69 @@ function Home({ songs }) {
 }
 
 export async function getStaticProps() {
+  // Fetch songs with weighting of 100
   const songs = await prisma.ep_songs.findMany({
-    where: {
-      weighting: 100,
-    },
-    orderBy: {
-      id: "desc",
-    },
+    where: { weighting: 100 },
+    orderBy: { id: "desc" },
   });
 
+  // Fetch the latest concert
   const latestConcert = await prisma.ep_shows.findFirst({
-    orderBy: {
-      date: "desc",
-    },
+    orderBy: { date: "desc" },
   });
 
-  const enhancedSongs = await Promise.all(
-    songs.map(async (song) => {
-      const performances = await prisma.ep_songperformances.findMany({
-        where: { songid: song.id },
-        orderBy: {
-          showid: "asc",
-        },
-      });
+  // Fetch all performances for the songs
+  const performancesData = await prisma.ep_songperformances.findMany({
+    where: { songid: { in: songs.map((song) => song.id) } },
+    orderBy: { showid: "asc" },
+  });
 
-      const totalQuality = performances.reduce(
-        (sum, performance) => sum + Number(performance.quality || 0),
-        0
-      );
+  // Fetch all shows related to the performances
+  const showIds = performancesData.map((perf) => perf.showid);
+  const shows = await prisma.ep_shows.findMany({
+    where: { id: { in: showIds } },
+  });
 
-      const debutPerformance = performances[0];
-      const debutDate = debutPerformance
-        ? await prisma.ep_shows.findUnique({
-            where: { id: debutPerformance.showid },
-          })
-        : null;
+  // Create a map for showId to show for quick lookup
+  const showsMap = shows.reduce((acc, show) => {
+    acc[show.id] = show;
+    return acc;
+  }, {});
 
-      const numberOfPerformances = performances.length;
-      const avg = totalQuality / numberOfPerformances || 0;
-      const lastPerformance = performances[performances.length - 1];
-      const currentGap = latestConcert
-        ? latestConcert.id - (lastPerformance ? lastPerformance.showid : 0)
-        : 0;
+  // Enhance songs with additional data
+  const enhancedSongs = songs.map((song) => {
+    const songPerformances = performancesData.filter(
+      (perf) => perf.songid === song.id
+    );
 
-      return {
-        ...song,
-        debutDate: debutDate ? debutDate.date : "N/A",
-        avg: avg.toFixed(2),
-        performances: numberOfPerformances,
-        currentGap,
-      };
-    })
-  );
+    const totalQuality = songPerformances.reduce(
+      (sum, perf) => sum + (perf.quality || 0),
+      0
+    );
 
-  return {
-    props: { songs: enhancedSongs },
-  };
+    const debutPerformance = songPerformances[0];
+    const debutDate = debutPerformance
+      ? showsMap[debutPerformance.showid]?.date || "N/A"
+      : "N/A";
+
+    const numberOfPerformances = songPerformances.length;
+    const avgQuality = totalQuality / numberOfPerformances || 0;
+
+    const lastPerformance = songPerformances[songPerformances.length - 1];
+    const currentGap = latestConcert
+      ? latestConcert.id - (lastPerformance ? lastPerformance.showid : 0)
+      : 0;
+
+    return {
+      ...song,
+      debutDate,
+      avg: avgQuality.toFixed(2),
+      performances: numberOfPerformances,
+      currentGap,
+    };
+  });
+
+  return { props: { songs: enhancedSongs } };
 }
 
 export default Home;

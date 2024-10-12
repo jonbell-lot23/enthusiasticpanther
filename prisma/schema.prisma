@@ -104,6 +104,7 @@ model ep_songperformances {
   showid  Int?
   songid  Int?
   quality Int?
+  show    ep_shows? @relation(fields: [showid], references: [id]) // Define the relation to ep_shows
 }
 
 model ep_shows {
@@ -111,6 +112,7 @@ model ep_shows {
   date     String?
   location String?
   quality  Int?    @db.SmallInt
+  performances ep_songperformances[] // Back-relation to ep_songperformances
 }
 
 enum Rating {
