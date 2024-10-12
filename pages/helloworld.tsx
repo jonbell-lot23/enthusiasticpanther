@@ -1,4 +1,3 @@
-// pages/HelloWorldPage.tsx
 import React from "react";
 import prisma from "../prisma";
 import NodeCache from "node-cache";
@@ -39,17 +38,15 @@ export async function getServerSideProps() {
     cache.set("top20Shows", top20Shows);
   }
 
-  // Ensure top20Shows is an array before sorting
-  if (Array.isArray(top20Shows)) {
-    // Shuffle the top 20 shows
-    const shuffledTop20Shows = top20Shows.sort(() => 0.5 - Math.random());
+// Ensure top20Shows is an array before sorting
+let highlyRatedShows = []; // Initialize highlyRatedShows outside the if-else scope
+if (Array.isArray(top20Shows)) {
+  // Shuffle the top 20 shows
+  const shuffledTop20Shows = top20Shows.sort(() => 0.5 - Math.random());
 
-    // Take the first 8 from the shuffled list
-    const highlyRatedShows = shuffledTop20Shows.slice(0, 8);
-  } else {
-    // Handle the case where top20Shows is not an array
-    const highlyRatedShows = [];
-  }
+  // Take the first 9 from the shuffled list
+  highlyRatedShows = shuffledTop20Shows.slice(0, 9);
+}
 
   // Fetch the latest show’s setlist
   const latestShow = latestShows[0];
@@ -88,8 +85,8 @@ export async function getServerSideProps() {
   return {
     props: {
       latestShows,
-      highlyRatedShows: [],
-      latestSetlist, // Return the setlist as props
+      highlyRatedShows,
+      latestSetlist,
     },
   };
 }
