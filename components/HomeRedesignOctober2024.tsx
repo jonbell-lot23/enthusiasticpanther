@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import prisma from "/prisma";
+import prisma from "../prisma";
 import ShowCard from "../components/ShowCard";
 import React from "react";
 import NodeCache from "node-cache";
