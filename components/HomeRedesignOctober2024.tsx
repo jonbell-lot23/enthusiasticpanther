@@ -1,26 +1,10 @@
-'use client'
+// components/HomeRedesignOctober2024.tsx
+import Image from 'next/image';
+import React from 'react';
 
-import Image from 'next/image'
-import prisma from "../prisma";
-import ShowCard from "../components/ShowCard";
-import React from "react";
-import NodeCache from "node-cache";
-
-export function BandLayout() {
-  const recentShows = [
-    { city: 'Portland', date: 'OCT 5' },
-    { city: 'San Francisco', date: 'OCT 4' },
-    { city: 'Los Angeles', date: 'OCT 3' },
-    { city: 'Las Vegas', date: 'OCT 2' },
-    { city: 'Phoenix', date: 'OCT 1' },
-    { city: 'Denver', date: 'SEP 29' },
-    { city: 'Dallas', date: 'SEP 27' },
-    { city: 'Chicago', date: 'SEP 25' },
-    { city: 'New York', date: 'SEP 23' },
-    { city: 'Boston', date: 'SEP 21' },
-    { city: 'Miami', date: 'SEP 19' },
-    { city: 'Atlanta', date: 'SEP 17' },
-  ]
+export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
+  // Separate the first show from the rest
+  const [firstShow, ...otherShows] = latestShows;
 
   return (
     <div className="bg-gray-900 text-white min-h-screen p-8 font-bebas-neue">
@@ -29,45 +13,86 @@ export function BandLayout() {
         <p className="text-2xl text-gray-400 mt-2">A MADE UP BAND</p>
       </header>
 
-      <main className="max-w-4xl mx-auto">
-        <section className="bg-purple-900 rounded-lg overflow-hidden mb-8 flex">
-          <div className="w-1/2">
+      <main className="max-w-4xl mx-auto space-y-0">
+        <h2 className="text-xl font-bold mb-4">LATEST SHOW</h2>
+
+        {/* Latest show section */}
+        <section className="relative bg-purple-900 rounded-lg overflow-hidden mb-8 flex">
+          {/* Background with image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center filter brightness-50 blur-xl scale-110"
+            style={{
+              backgroundImage: `url('/show-art/show${firstShow.id}.png')`,
+            }}
+          ></div>
+
+          {/* Content on top of the background */}
+          <div className="relative">
             <Image
-              src="/show-art/show324.png"
+              src={`/show-art/show${firstShow.id}.png`}
               alt="Featured show artwork"
               width={400}
-              height={300}
+              height={400}
               className="object-cover w-full h-full"
             />
           </div>
-          <div className="w-1/2 p-6">
-            <h2 className="text-3xl font-bold mb-2">LATEST SHOW</h2>
-            <p className="text-2xl mb-4">SEATTLE, USA<br />OCTOBER 6, 2024</p>
+          <div className="relative p-6 w-1/2 bg-transparent bg-opacity-90">
+            <p className="text-2xl mb-4">
+              {firstShow.location.toUpperCase()}
+              <br />
+              {firstShow.date}
+            </p>
             <h3 className="text-2xl font-bold mb-2">SETLIST</h3>
-            <ul className="text-lg">
-              <li>REPORTING LIVE</li>
-              <li>FOUR TURTLES</li>
-              <li>CRANBERRY CRYSTALS</li>
-              <li>BOOKSHELF</li>
-              <li>PATRICK SWAYZE</li>
-            </ul>
+            <div className="text-md">
+              {latestSetlist.map((song, index) => (
+                <>
+                  <span key={index}>
+                    {song.name.toUpperCase()} {song.isDebut && <sup>DEBUT</sup>}
+                  </span>
+                  <span>• </span>
+                </>
+              ))}
+            </div>
           </div>
         </section>
 
+        {/* Recent shows section */}
         <section>
-          <h2 className="text-3xl font-bold mb-4">RECENT SHOWS</h2>
+          <h2 className="text-xl font-bold mb-4 mt-16">RECENT SHOWS</h2>
           <div className="grid grid-cols-3 gap-4">
-            {recentShows.map((show, index) => (
-              <div key={show.city} className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+            {otherShows.map((show) => (
+              <div key={show.id} className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
                 <Image
-                  src={`/show-art/show324.png`}
-                  alt={`${show.city} show`}
-                  width={300}
-                  height={200}
-                  className="w-full h-48 object-cover m-6"
+                  src={`/show-art/show${show.id}.png`}
+                  alt={`${show.location} show`}
+                  width={400}
+                  height={400}
+                  className="w-full h-48 object-cover"
                 />
                 <div className="p-4">
-                  <p className="text-lg font-medium">{show.city.toUpperCase()}</p>
+                  <p className="text-lg font-medium">{show.location.toUpperCase()}</p>
+                  <p className="text-md text-gray-400">{show.date}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Highly rated shows section */}
+        <section>
+          <h2 className="text-xl font-bold mb-4 mt-16">HIGHLY RATED SHOWS</h2>
+          <div className="grid grid-cols-3 gap-4">
+            {highlyRatedShows.map((show) => (
+              <div key={show.id} className="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+                <Image
+                  src={`/show-art/show${show.id}.png`}
+                  alt={`${show.location} show`}
+                  width={400}
+                  height={400}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <p className="text-lg font-medium">{show.location.toUpperCase()}</p>
                   <p className="text-md text-gray-400">{show.date}</p>
                 </div>
               </div>
@@ -76,5 +101,5 @@ export function BandLayout() {
         </section>
       </main>
     </div>
-  )
+  );
 }
