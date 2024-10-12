@@ -17,7 +17,7 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
         <h2 className="text-lg md:text-xl font-bold mb-4">LATEST SHOW</h2>
 
         {/* Latest show section */}
-        <section className="relative bg-purple-900 rounded-lg overflow-hidden mb-8 flex flex-col md:flex-row">
+        <section className="relative bg-black rounded-lg overflow-hidden mb-8 flex flex-col md:flex-row">
           {/* Background with image */}
           <div
             className="absolute inset-0 bg-cover bg-center filter brightness-50 blur-xl scale-110"
