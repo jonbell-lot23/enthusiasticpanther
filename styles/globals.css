@@ -4,8 +4,7 @@
 
 html,
 body {
-  font-family: -apple-system, "Inter", Menlo, Consolas, "Ubuntu Mono",
-    "Roboto Mono", "DejaVu Sans Mono", monospace;
+  font-family: 'Bebas Neue', sans-serif;
   background-color: #efefef;
   color: #1715167e;
 }
