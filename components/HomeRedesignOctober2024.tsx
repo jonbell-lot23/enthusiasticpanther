@@ -10,7 +10,7 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
+    return date.toLocaleDateString('en-US', options as Intl.DateTimeFormatOptions);
   };
 
   // Inline component for show formatting
