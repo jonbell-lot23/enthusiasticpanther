@@ -1,7 +1,6 @@
 import styles from "./Song.module.css"; // Update stylesheet for song details
 import prisma from "/prisma";
-import ShowCard from "../../components/ShowCard";
-import GapCard from "../../components/GapCard";
+
 function SongPage({ songDetails, performances }) {
   return (
     <div className={styles.container}>
@@ -9,29 +8,7 @@ function SongPage({ songDetails, performances }) {
         {songDetails.name}
       </h2>
 
-      <div className={styles.performancesContainer}>
-        {performances &&
-          performances.map((performance, index) => (
-            <div
-              key={index}
-              className={performance.type === "show" ? styles.card : styles.gap}
-            >
-              {performance.type === "show" ? (
-                <ShowCard
-                  showId={performance.showId}
-                  location={performance.location}
-                  showScore={performance.quality}
-                />
-              ) : (
-                <div className={styles.gapContainer}>
-                  {[...Array(performance.gap)].map((_, i) => (
-                    <div key={i}>.</div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-      </div>
+      <BarGraph performances={performances} /> {/* Use the BarGraph component */}
     </div>
   );
 }
@@ -39,46 +16,52 @@ function SongPage({ songDetails, performances }) {
 export async function getServerSideProps(context) {
   const songId = Number(context.params.songid);
 
-  // Fetch the song performances for the given song ID
-  const songPerformances = await prisma.ep_songperformances.findMany({
-    where: { songid: songId },
-    orderBy: { id: "desc" },
+  // Fetch all shows
+  const allShows = await prisma.ep_shows.findMany({
+    orderBy: { id: "asc" },
   });
 
-  // Map the song performances to include show details and the gap between shows
-  let previousShowId = null;
-  const performances = [];
+  // Fetch the song performances for the given song ID including the quality
+  const songPerformances = await prisma.ep_songperformances.findMany({
+    where: { songid: songId },
+    select: { showid: true, quality: true }, // Select the showid and quality
+  });
 
-  for (const performance of songPerformances) {
-    // Fetch show details for each performance
-    const show = await prisma.ep_shows.findUnique({
-      where: { id: performance.showid },
-    });
+  // Map all shows to include a played boolean and the performance quality
+  const performances = allShows.map(show => {
+    const performance = songPerformances.find(sp => sp.showid === show.id);
+    return {
+      showId: show.id,
+      played: performance ? true : false,
+      quality: performance ? performance.quality : null, // Include the quality score
+    };
+  });
 
-    // If there's a previous show, calculate the gap and add it to the performances array
-    if (previousShowId) {
-      const gap = previousShowId - performance.showid;
-      performances.push({
-        type: "gap",
-        gap,
-      });
-    }
-
-    // Add the show to the performances array
-    performances.push({
-      type: "show",
-      location: show.location,
-      date: show.date,
-      quality: performance.quality,
-      showId: performance.showid,
-    });
-    previousShowId = performance.showid;
-  }
-  await prisma.$disconnect();
   const songDetails = await prisma.ep_songs.findUnique({
     where: { id: songId },
   });
+
   return { props: { songDetails, performances } };
 }
 
+function BarGraph({ performances }) {
+  return (
+    <div className={styles.barGraph}>
+      {performances.map((performance, index) => {
+        let barHeight = performance.played ? (performance.quality ? performance.quality * 5 : 20) : 500; // Set height to 500px if not played
+        barHeight = Math.min(barHeight, 500);
+        return (
+          <div
+            key={index}
+            className={performance.played ? styles.playedBar : styles.notPlayedBar}
+            style={{ height: `${barHeight}px` }} // Set the height dynamically
+            title={`Quality: ${performance.quality || 'N/A'}`}
+          >
+            {performance.quality && <span className="hidden">{performance.quality}</span>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 export default SongPage;

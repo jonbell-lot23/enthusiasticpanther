@@ -35,7 +35,7 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-bebas-neue">
       <header className="max-w-4xl mx-auto bg-gray-800 rounded-lg p-4 md:p-6 mb-8 text-center">
         <h1 className="text-3xl md:text-5xl font-bold tracking-wider">ENTHUSIASTIC PANTHER</h1>
-        <p className="text-xl md:text-2xl text-gray-400 mt-2">A MADE UP BAND</p>
+        <p className="text-xl md:text-2xl text-gray-400 mt-2">IS A MADE UP BAND</p>
       </header>
 
       <main className="max-w-4xl mx-auto space-y-0">

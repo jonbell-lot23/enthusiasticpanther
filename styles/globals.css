@@ -22,6 +22,25 @@ a:hover {
   box-sizing: border-box;
 }
 
+.barGraph {
+  display: flex;
+  align-items: flex-end;
+}
+
+.playedBar {
+  width: 10px;
+  height: 20px; /* Example height */
+  background-color: black;
+  margin-right: 2px;
+}
+
+.notPlayedBar {
+  width: 10px;
+  height: 20px; /* Example height */
+  background-color: lightgrey;
+  margin-right: 2px;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -9,15 +9,14 @@ const Header = () => {
   };
 
   return (
-    <div className="flex justify-between p-3 text-white bg-black">
+    <div className="flex justify-center p-3 text-white bg-black text-xl">
       <Link href="/">
-        <a className={isActive("/") ? "text-yellow-300" : ""}>
-          {" "}
+        <a className={isActive("/") ? "text-white" : ""}>
           <h1 className="m-0 font-normal">Enthusiastic Panther</h1>
         </a>
       </Link>
 
-      <div className="space-x-4 font-normal">
+      <div className="space-x-4 font-normal hidden">
         <Link href="/about">
           <a className={isActive("/about") ? "text-yellow-300" : ""}>About</a>
         </Link>
