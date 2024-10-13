@@ -141,7 +141,7 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore, date }) {
             <span style={{ textAlign: "left" }}>{city}</span>
             <span style={{ textAlign: "right", fontSize: "0.75rem" }}>{date}</span>
           </div>
-          {showId <= 327 ? (
+          {showId <= 329 ? (
             <img
               src={`/show-art/show${showId}.png`}
               alt={location}
