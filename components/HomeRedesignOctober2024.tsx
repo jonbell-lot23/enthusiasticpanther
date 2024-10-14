@@ -1,6 +1,7 @@
 // components/HomeRedesignOctober2024.tsx
 import Image from 'next/image';
 import React from 'react';
+import Link from 'next/link';
 
 export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
   // Separate the first show from the rest
@@ -33,7 +34,7 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
 
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-bebas-neue">
-      <header className="max-w-4xl mx-auto bg-gray-800 rounded-lg p-4 md:p-6 mb-8 text-center">
+      <header className="max-w-4xl mx-auto rounded-lg p-4 md:p-6 mb-8 text-center">
         <h1 className="text-3xl md:text-5xl font-bold tracking-wider">ENTHUSIASTIC PANTHER</h1>
         <p className="text-xl md:text-2xl text-gray-400 mt-2">IS A MADE UP BAND</p>
       </header>
@@ -71,10 +72,12 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
             <div className="text-2xl md:text-md">
               {latestSetlist.map((song, index) => (
                 <React.Fragment key={index}>
-                  <span>
-                    {song.name.toUpperCase()} {song.isDebut && <sup>DEBUT</sup>}
-                  </span>
-                  <span>• </span>
+                  <Link href={`/song/${song.id}`}>
+                    <a>
+                      {song.name.toUpperCase()} {song.isDebut && <sup>DEBUT</sup>}
+                    </a>
+                  </Link>
+                  {index < latestSetlist.length - 1 && <span> • </span>}
                 </React.Fragment>
               ))}
             </div>

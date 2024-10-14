@@ -12,7 +12,7 @@ const Header = () => {
     <div className="flex justify-center p-3 text-white bg-black text-xl">
       <Link href="/">
         <a className={isActive("/") ? "text-white" : ""}>
-          <h1 className="m-0 font-normal">Enthusiastic Panther</h1>
+          <h1 className="m-0 font-normal hidden">Enthusiastic Panther</h1>
         </a>
       </Link>
 
