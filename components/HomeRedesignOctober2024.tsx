@@ -19,7 +19,7 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
 
   // Inline component for show formatting
   const ShowCard = ({ show }) => (
-    <Link href={`/show/${show.id}`} key={show.id}>
+    <Link href={show.link} key={show.id}>
       <a className="overflow-hidden mx-2 md:mx-0 cursor-pointer">
         <Image
           src={`/show-art/show${show.id}.png`}
@@ -66,14 +66,18 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
           ></div>
 
           <div className="relative w-full md:w-1/2">
-            <Image
-              src={`/show-art/show${firstShow.id}.png`}
-              alt="Featured show artwork"
-              layout="responsive"
-              width={400}
-              height={400}
-              className="object-cover w-full h-full"
-            />
+            <Link href={firstShow.link}>
+              <a>
+                <Image
+                  src={`/show-art/show${firstShow.id}.png`}
+                  alt="Featured show artwork"
+                  layout="responsive"
+                  width={400}
+                  height={400}
+                  className="object-cover w-full h-full"
+                />
+              </a>
+            </Link>
           </div>
           <div className="relative p-4 md:p-6 w-full md:w-1/2 bg-transparent bg-opacity-90">
             <p className="text-xl md:text-2xl mb-4">

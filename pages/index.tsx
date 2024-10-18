@@ -22,7 +22,10 @@ export default function HelloWorldPage({
           ...show,
           link: `/show/${show.id}`,
         }))}
-        latestSetlist={latestSetlist}
+        latestSetlist={latestSetlist.map((song) => ({
+          ...song,
+          link: `/show/${latestShows[0].id}`,
+        }))}
       />
     </div>
   );

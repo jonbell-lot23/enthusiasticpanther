@@ -1,5 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
+import Link from "next/link";
 import prisma from "/prisma";
 
 const calculatePercentile = (scores, percentile) => {
@@ -15,36 +17,22 @@ const ScoreVisualization = ({ songScores, currentScore }) => {
   const min = Math.max(Math.min(...songScores), lowMid - (highMid - lowMid));
   const max = Math.min(Math.max(...songScores), highMid + (highMid - lowMid));
 
-  // Add buffer for scores at the edges
-  const buffer = 5; // 5% buffer
+  const buffer = 5;
   const adjustedMin = min - buffer < 0 ? 0 : min - buffer;
   const adjustedMax = max + buffer > 100 ? 100 : max + buffer;
 
-  console.log("Adjusted Min:", adjustedMin);
-  console.log("Adjusted Max:", adjustedMax);
   const totalRange = adjustedMax - adjustedMin;
-  console.log("Total Range:", totalRange);
-
   const averageWidth = ((highMid - lowMid) / totalRange) * 100;
-  console.log("Average Width:", averageWidth);
-
   const averageStart = ((lowMid - adjustedMin) / totalRange) * 100;
-  console.log("Average Start:", averageStart);
 
   let scorePosition = ((currentScore - adjustedMin) / totalRange) * 100;
-  scorePosition = Math.min(scorePosition, 100); // Ensure scorePosition does not exceed 100
-  console.log(
-    `Score Position for currentScore ${currentScore}:`,
-    scorePosition
-  );
+  scorePosition = Math.min(scorePosition, 100);
 
-  // Adjust position to ensure visibility even at 100%
-  const dotMargin = 3; // 1% margin
+  const dotMargin = 3;
   const adjustedScorePosition =
     scorePosition === 100 ? scorePosition - dotMargin : scorePosition;
 
-  // Determine dot color based on score
-  let dotColor = "bg-black"; // Default color
+  let dotColor = "bg-black";
   if (currentScore === 100) {
     dotColor = "bg-green-500";
   } else if (currentScore < 40) {
@@ -72,54 +60,69 @@ export default function SetlistPage({ show, songs }) {
 
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-bebas-neue">
+      <Link href="/">
+        <a className="text-white text-lg mb-4 inline-block">← Back</a>
+      </Link>
       <main className="max-w-4xl mx-auto space-y-8">
-        <header className="text-center">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-wider mb-2">
-            {show.location.toUpperCase()}
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-400">
-            {new Date(show.date)
-              .toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })
-              .toUpperCase()}
-          </p>
+        <header className="relative bg-black rounded-lg overflow-hidden mb-8 flex flex-col md:flex-row">
+          <div
+            className="absolute inset-0 bg-cover bg-center filter brightness-50 blur-xl scale-110"
+            style={{
+              backgroundImage: `url('/show-art/show${show.id}.png')`,
+            }}
+          ></div>
+          <div className="relative w-full md:w-1/3">
+            <Image
+              src={`/show-art/show${show.id}.png`}
+              alt="Concert artwork"
+              layout="responsive"
+              width={400}
+              height={400}
+              className="object-cover w-full h-full"
+            />
+          </div>
+          <div className="relative p-4 md:p-6 w-full md:w-2/3 bg-transparent bg-opacity-90">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-wider mb-2">
+              {show.location.toUpperCase()}
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-400">
+              {new Date(show.date)
+                .toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+                .toUpperCase()}
+            </p>
+            <Card className="bg-transparent border-none text-white m-0">
+              <div className="text-2xl space-y-2 pt-4">
+                <p>Total Songs: {songs.length}</p>
+                <p>Average Score: {averageScore}</p>
+                <p>
+                  Highest Rated:{" "}
+                  {Math.max(...songs.map((song) => song.quality))}
+                </p>
+              </div>
+            </Card>
+          </div>
         </header>
 
-        <Card className="bg-gray-800 border-none text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-2xl font-bold text-white">
-              Setlist Summary
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl space-y-2">
-              <p>Total Songs: {songs.length}</p>
-              <p>Average Score: {averageScore}</p>
-              <p>
-                Highest Rated: {Math.max(...songs.map((song) => song.quality))}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
         <div className="space-y-4">
-          {songs.map((song) => {
-            console.log("Song Name:", song.name);
-            return (
-              <div key={song.id} className="flex items-center space-x-4">
-                <div className="w-1/2">
-                  <ScoreVisualization
-                    songScores={song.allScores}
-                    currentScore={song.quality}
-                  />
-                </div>
-                <div className="w-1/2 text-xl">{song.name}</div>
+          {songs.map((song) => (
+            <div key={song.id} className="flex items-center space-x-4">
+              <div className="w-1/2">
+                <ScoreVisualization
+                  songScores={song.allScores}
+                  currentScore={song.quality}
+                />
               </div>
-            );
-          })}
+              <div className="w-1/2 text-xl">
+                <Link href={`/song/${song.id}`}>
+                  <a>{song.name}</a>
+                </Link>
+              </div>
+            </div>
+          ))}
         </div>
       </main>
     </div>
@@ -141,7 +144,6 @@ export async function getServerSideProps(context) {
     return { notFound: true };
   }
 
-  // Fetch performances for the specific show
   const performances = await prisma.ep_songperformances.findMany({
     where: { showid: showId },
     select: {
@@ -150,10 +152,8 @@ export async function getServerSideProps(context) {
     },
   });
 
-  // Fetch all songs
   const songs = await prisma.ep_songs.findMany();
 
-  // Fetch all performances to get historical data
   const allPerformances = await prisma.ep_songperformances.findMany({
     select: {
       songid: true,
@@ -161,7 +161,6 @@ export async function getServerSideProps(context) {
     },
   });
 
-  // Create a map of all performances for each song
   const songPerformanceMap = allPerformances.reduce((acc, performance) => {
     if (!acc[performance.songid]) {
       acc[performance.songid] = [];
@@ -170,7 +169,6 @@ export async function getServerSideProps(context) {
     return acc;
   }, {});
 
-  // Combine the data
   const songsWithQuality = performances.map((performance) => {
     const song = songs.find((s) => s.id === performance.songid);
     return {
