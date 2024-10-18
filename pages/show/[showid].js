@@ -20,10 +20,36 @@ const ScoreVisualization = ({ songScores, currentScore }) => {
   const adjustedMin = min - buffer < 0 ? 0 : min - buffer;
   const adjustedMax = max + buffer > 100 ? 100 : max + buffer;
 
+  console.log("Adjusted Min:", adjustedMin);
+  console.log("Adjusted Max:", adjustedMax);
   const totalRange = adjustedMax - adjustedMin;
+  console.log("Total Range:", totalRange);
+
   const averageWidth = ((highMid - lowMid) / totalRange) * 100;
+  console.log("Average Width:", averageWidth);
+
   const averageStart = ((lowMid - adjustedMin) / totalRange) * 100;
-  const scorePosition = ((currentScore - adjustedMin) / totalRange) * 100;
+  console.log("Average Start:", averageStart);
+
+  let scorePosition = ((currentScore - adjustedMin) / totalRange) * 100;
+  scorePosition = Math.min(scorePosition, 100); // Ensure scorePosition does not exceed 100
+  console.log(
+    `Score Position for currentScore ${currentScore}:`,
+    scorePosition
+  );
+
+  // Adjust position to ensure visibility even at 100%
+  const dotMargin = 3; // 1% margin
+  const adjustedScorePosition =
+    scorePosition === 100 ? scorePosition - dotMargin : scorePosition;
+
+  // Determine dot color based on score
+  let dotColor = "bg-black"; // Default color
+  if (currentScore === 100) {
+    dotColor = "bg-green-500";
+  } else if (currentScore < 40) {
+    dotColor = "bg-red-500";
+  }
 
   return (
     <div className="relative w-full h-6 bg-gray-100 rounded-lg overflow-hidden">
@@ -32,8 +58,8 @@ const ScoreVisualization = ({ songScores, currentScore }) => {
         style={{ left: `${averageStart}%`, width: `${averageWidth}%` }}
       />
       <div
-        className="absolute w-2 h-2 bg-gray-900 rounded-full top-1/2 transform -translate-y-1/2"
-        style={{ left: `${scorePosition}%` }}
+        className={`absolute w-2 h-2 ${dotColor} rounded-full top-1/2 transform -translate-y-1/2`}
+        style={{ left: `${adjustedScorePosition}%` }}
       />
     </div>
   );
@@ -80,17 +106,20 @@ export default function SetlistPage({ show, songs }) {
         </Card>
 
         <div className="space-y-4">
-          {songs.map((song) => (
-            <div key={song.id} className="flex items-center space-x-4">
-              <div className="w-1/2">
-                <ScoreVisualization
-                  songScores={song.allScores}
-                  currentScore={song.quality}
-                />
+          {songs.map((song) => {
+            console.log("Song Name:", song.name);
+            return (
+              <div key={song.id} className="flex items-center space-x-4">
+                <div className="w-1/2">
+                  <ScoreVisualization
+                    songScores={song.allScores}
+                    currentScore={song.quality}
+                  />
+                </div>
+                <div className="w-1/2 text-xl">{song.name}</div>
               </div>
-              <div className="w-1/2 text-xl">{song.name}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
     </div>
