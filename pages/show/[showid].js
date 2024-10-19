@@ -53,7 +53,7 @@ const ScoreVisualization = ({ songScores, currentScore }) => {
   );
 };
 
-export default function SetlistPage({ show, songs }) {
+export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
   const averageScore = Math.round(
     songs.reduce((sum, song) => sum + song.quality, 0) / songs.length
   );
@@ -107,6 +107,27 @@ export default function SetlistPage({ show, songs }) {
           </div>
         </header>
 
+        <div className="flex justify-between items-center mb-8">
+          <Link href={`/show/${prevShowId}`}>
+            <a
+              className={`text-lg ${
+                prevShowId ? "text-white" : "text-gray-500 pointer-events-none"
+              }`}
+            >
+              ← Previous Show
+            </a>
+          </Link>
+          <Link href={`/show/${nextShowId}`}>
+            <a
+              className={`text-lg ${
+                nextShowId ? "text-white" : "text-gray-500 pointer-events-none"
+              }`}
+            >
+              Next Show →
+            </a>
+          </Link>
+        </div>
+
         <div className="space-y-4">
           {songs.map((song) => (
             <div key={song.id} className="flex items-center space-x-4">
@@ -129,8 +150,23 @@ export default function SetlistPage({ show, songs }) {
   );
 }
 
-export async function getServerSideProps(context) {
-  const showId = Number(context.params?.showid);
+export async function getStaticPaths() {
+  const shows = await prisma.ep_shows.findMany({
+    select: { id: true },
+  });
+
+  const paths = shows.map((show) => ({
+    params: { showid: show.id.toString() },
+  }));
+
+  return {
+    paths,
+    fallback: "blocking",
+  };
+}
+
+export async function getStaticProps({ params }) {
+  const showId = Number(params.showid);
 
   if (isNaN(showId)) {
     return { notFound: true };
@@ -179,6 +215,16 @@ export async function getServerSideProps(context) {
     };
   });
 
+  const allShows = await prisma.ep_shows.findMany({
+    orderBy: { id: "asc" },
+    select: { id: true },
+  });
+
+  const currentIndex = allShows.findIndex((s) => s.id === showId);
+  const prevShowId = currentIndex > 0 ? allShows[currentIndex - 1].id : null;
+  const nextShowId =
+    currentIndex < allShows.length - 1 ? allShows[currentIndex + 1].id : null;
+
   return {
     props: {
       show: {
@@ -187,6 +233,9 @@ export async function getServerSideProps(context) {
         location: show.location || "",
       },
       songs: songsWithQuality,
+      prevShowId,
+      nextShowId,
     },
+    revalidate: 600,
   };
 }
