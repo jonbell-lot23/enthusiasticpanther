@@ -1,16 +1,81 @@
-import React, { useState, useEffect } from "react";
-import { Line, Bar, Pie } from "react-chartjs-2";
-import { Chart as ChartJS, registerables } from "chart.js";
-import styles from "./Song.module.css";
-import prisma from "/prisma";
-import Link from "next/link";
+import React from "react";
 
-ChartJS.register(...registerables);
+function DotGraph({ performances }) {
+  return (
+    <div className="flex flex-wrap items-center justify-center w-full gap-2">
+      {performances.map((performance, index) => (
+        <PerformanceDot key={index} performance={performance} />
+      ))}
+    </div>
+  );
+}
 
-function SongPage({ songDetails, performances }) {
-  const [stats, setStats] = useState(null);
+function PerformanceDot({ performance }) {
+  const size = 36; // Size of the dot in pixels (3 times larger than before)
+  const radius = size / 2;
 
-  useEffect(() => {
+  // Calculate the fill percentage and color based on the quality
+  let fillPercentage = 0;
+  let fillColor = "#FFFFFF"; // Default white color
+  let outlineColor = "#4B5563"; // Default gray outline
+
+  if (performance.played) {
+    if (performance.quality <= 25) {
+      fillPercentage = 0;
+      outlineColor = "#EF4444"; // Red outline for 0-25%
+    } else if (performance.quality <= 50) {
+      fillPercentage = 25;
+    } else if (performance.quality <= 75) {
+      fillPercentage = 50;
+    } else if (performance.quality < 100) {
+      fillPercentage = 75;
+    } else {
+      fillPercentage = 100;
+      fillColor = "#10B981"; // Green fill for 100%
+    }
+  }
+
+  // Calculate the end angle for the arc (in radians)
+  const endAngle = (fillPercentage / 100) * 2 * Math.PI;
+
+  // Calculate the SVG arc path
+  const path = calculateArcPath(radius, endAngle);
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {/* Background circle */}
+      <circle
+        cx={radius}
+        cy={radius}
+        r={radius - 1} // Slightly smaller to show outline
+        fill="#1F2937" // Dark background
+        stroke={outlineColor}
+        strokeWidth="2"
+      />
+      {/* Foreground partial circle (filled) */}
+      <path
+        d={path}
+        fill={fillColor}
+        transform={`translate(${radius}, ${radius}) rotate(-90)`} // Center and rotate to start from the top
+      />
+    </svg>
+  );
+}
+
+function calculateArcPath(radius, endAngle) {
+  const startX = radius;
+  const startY = 0;
+  const endX = radius * Math.cos(endAngle);
+  const endY = radius * Math.sin(endAngle);
+  const largeArcFlag = endAngle > Math.PI ? 1 : 0;
+
+  return `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} L 0 0 Z`;
+}
+
+export default function SongPage({ songDetails, performances }) {
+  const [stats, setStats] = React.useState(null);
+
+  React.useEffect(() => {
     if (songDetails && songDetails.id) {
       fetch(`/api/songStatistics?songId=${songDetails.id}`)
         .then((res) => res.json())
@@ -21,55 +86,6 @@ function SongPage({ songDetails, performances }) {
   if (!songDetails) {
     return <div>Loading...</div>;
   }
-
-  const performanceData = performances
-    .filter((p) => p.played)
-    .map((p) => p.quality);
-  const labels = performances
-    .filter((p) => p.played)
-    .map((_, index) => `Performance ${index + 1}`);
-
-  const qualityDistribution = [0, 0, 0, 0, 0];
-  performanceData.forEach((quality) => {
-    if (quality > 0 && quality <= 5) qualityDistribution[quality - 1]++;
-  });
-
-  const lineChartData = {
-    labels: labels,
-    datasets: [
-      {
-        label: "Performance Quality",
-        data: performanceData,
-        fill: false,
-        borderColor: "rgb(75, 192, 192)",
-        tension: 0.1,
-      },
-    ],
-  };
-
-  const barChartData = {
-    labels: ["1", "2", "3", "4", "5"],
-    datasets: [
-      {
-        label: "Quality Distribution",
-        data: qualityDistribution,
-        backgroundColor: "rgba(75, 192, 192, 0.6)",
-      },
-    ],
-  };
-
-  const pieChartData = {
-    labels: ["Played", "Not Played"],
-    datasets: [
-      {
-        data: [
-          performances.filter((p) => p.played).length,
-          performances.filter((p) => !p.played).length,
-        ],
-        backgroundColor: ["rgba(75, 192, 192, 0.6)", "rgba(255, 99, 132, 0.6)"],
-      },
-    ],
-  };
 
   const firstPerformance = performances.find((p) => p.played);
   const lastPerformance = [...performances].reverse().find((p) => p.played);
@@ -84,12 +100,10 @@ function SongPage({ songDetails, performances }) {
     : "Loading...";
 
   return (
-    <div
-      className={`${styles.container} bg-gray-900 text-white min-h-screen p-4 md:p-8`}
-    >
-      <Link href="/">
-        <a className="text-white text-lg mb-4 inline-block">← Back</a>
-      </Link>
+    <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8">
+      <a href="/" className="text-white text-lg mb-4 inline-block">
+        ← Back
+      </a>
       <h2 className="text-4xl font-bold text-center mb-8">
         {songDetails.name}
       </h2>
@@ -118,75 +132,8 @@ function SongPage({ songDetails, performances }) {
       </div>
 
       <div className="flex flex-col items-center space-y-8">
-        <BarGraph
-          performances={performances.slice(
-            0,
-            Math.ceil(performances.length / 2)
-          )}
-        />
-        <BarGraph
-          performances={performances.slice(Math.ceil(performances.length / 2))}
-        />
+        <DotGraph performances={performances} />
       </div>
     </div>
   );
 }
-
-function BarGraph({ performances }) {
-  return (
-    <div className="flex justify-center items-end space-x-0">
-      {performances.map((performance, index) => {
-        let barHeight = performance.played
-          ? performance.quality
-            ? performance.quality * 5
-            : 20
-          : 500;
-        barHeight = Math.min(barHeight, 500);
-        return (
-          <div
-            key={index}
-            className={`w-1 ${
-              performance.played ? "bg-blue-300" : "bg-gray-800"
-            } rounded-t-lg`}
-            style={{ height: `${barHeight}px` }}
-            title={`Quality: ${performance.quality || "N/A"}`}
-          >
-            {performance.quality && (
-              <span className="hidden">{performance.quality}</span>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-export async function getServerSideProps(context) {
-  const songId = Number(context.params.songid);
-
-  const allShows = await prisma.ep_shows.findMany({
-    orderBy: { id: "asc" },
-  });
-
-  const songPerformances = await prisma.ep_songperformances.findMany({
-    where: { songid: songId },
-    select: { showid: true, quality: true },
-  });
-
-  const performances = allShows.map((show) => {
-    const performance = songPerformances.find((sp) => sp.showid === show.id);
-    return {
-      showId: show.id,
-      played: performance ? true : false,
-      quality: performance ? performance.quality : null,
-    };
-  });
-
-  const songDetails = await prisma.ep_songs.findUnique({
-    where: { id: songId },
-  });
-
-  return { props: { songDetails, performances } };
-}
-
-export default SongPage;
