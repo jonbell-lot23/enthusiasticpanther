@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import prisma from "/prisma";
+import { useRouter } from "next/router";
 
 const calculatePercentile = (scores, percentile) => {
   const sortedScores = scores.sort((a, b) => a - b);
@@ -54,6 +55,23 @@ const ScoreVisualization = ({ songScores, currentScore }) => {
 };
 
 export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === "ArrowLeft" && prevShowId) {
+        router.push(`/show/${prevShowId}`);
+      } else if (event.key === "ArrowRight" && nextShowId) {
+        router.push(`/show/${nextShowId}`);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [prevShowId, nextShowId, router]);
+
   const averageScore = Math.round(
     songs.reduce((sum, song) => sum + song.quality, 0) / songs.length
   );
