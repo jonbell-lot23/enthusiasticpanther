@@ -2,7 +2,7 @@ import React from "react";
 
 function DotGraph({ performances }) {
   return (
-    <div className="flex flex-wrap items-center justify-center w-full gap-2">
+    <div className="flex flex-wrap w-full gap-2">
       {performances.map((performance, index) => (
         <PerformanceDot key={index} performance={performance} />
       ))}
@@ -17,12 +17,10 @@ function PerformanceDot({ performance }) {
   // Calculate the fill percentage and color based on the quality
   let fillPercentage = 0;
   let fillColor = "#FFFFFF"; // Default white color
-  let outlineColor = "#4B5563"; // Default gray outline
 
   if (performance.played) {
     if (performance.quality <= 25) {
       fillPercentage = 0;
-      outlineColor = "#EF4444"; // Red outline for 0-25%
     } else if (performance.quality <= 50) {
       fillPercentage = 25;
     } else if (performance.quality <= 75) {
@@ -49,8 +47,6 @@ function PerformanceDot({ performance }) {
         cy={radius}
         r={radius - 1} // Slightly smaller to show outline
         fill="#1F2937" // Dark background
-        stroke={outlineColor}
-        strokeWidth="2"
       />
       {/* Foreground partial circle (filled) */}
       <path
