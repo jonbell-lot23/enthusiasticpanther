@@ -11,7 +11,7 @@ function DotGraph({ performances }) {
 }
 
 function PerformanceDot({ performance }) {
-  const size = 36; // Size of the dot in pixels (3 times larger than before)
+  const size = 32; // Size of the dot in pixels (3 times larger than before)
   const radius = size / 2;
 
   // Calculate the fill percentage and color based on the quality
