@@ -4,9 +4,10 @@
 
 html,
 body {
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: "Bebas Neue", sans-serif;
   background-color: #efefef;
   color: #1715167e;
+  background-color: black;
 }
 
 a {

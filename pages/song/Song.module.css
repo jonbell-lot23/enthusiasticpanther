@@ -3,6 +3,7 @@
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  background-color: black;
 }
 
 .statsGrid {
@@ -30,7 +31,7 @@
   background-color: #ffffff;
   padding: 15px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .barGraph {
@@ -38,7 +39,8 @@
   align-items: flex-end;
 }
 
-.playedBar, .notPlayedBar {
+.playedBar,
+.notPlayedBar {
   width: 3px;
 }
 
