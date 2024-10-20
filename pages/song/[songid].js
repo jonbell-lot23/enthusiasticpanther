@@ -44,30 +44,34 @@ function SongPage({ songDetails, performances }) {
         {songDetails.name}
       </h2>
 
-      <div className="flex flex-col gap-8 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-gray-800 p-6 rounded-lg text-center">
-          <h3 className="text-xl font-semibold">First Performance</h3>
-          <p>{firstPerformance ? `Show #${firstPerformance.showId}` : "N/A"}</p>
+          <p className="text-6xl font-medium">
+            {firstPerformance ? `Show #${firstPerformance.showId}` : "N/A"}
+          </p>
+          <h3 className="text-lg font-light mt-2">First Performance</h3>
         </div>
         <div className="bg-gray-800 p-6 rounded-lg text-center">
-          <h3 className="text-xl font-semibold">Most Recent Performance</h3>
-          <p>
-            {lastPerformance
-              ? `Show #${lastPerformance.showId} (${showsSinceLastPerformance} shows ago)`
-              : "N/A"}
+          <p className="text-6xl font-medium">
+            {lastPerformance ? `Show #${lastPerformance.showId}` : "N/A"}
+          </p>
+          <h3 className="text-lg font-light mt-2">Most Recent Performance</h3>
+          <p className="text-sm">
+            {lastPerformance ? `(${showsSinceLastPerformance} shows ago)` : ""}
           </p>
         </div>
         <div className="bg-gray-800 p-6 rounded-lg text-center">
-          <h3 className="text-xl font-semibold">Average Quality</h3>
-          <p>{averageQuality}</p>
+          <p className="text-6xl font-medium">{averageQuality}</p>
+          <h3 className="text-lg font-light mt-2">Average Quality</h3>
         </div>
         <div className="bg-gray-800 p-6 rounded-lg text-center">
-          <h3 className="text-xl font-semibold">Total Performances</h3>
-          <p>{totalPerformances}</p>
+          <p className="text-6xl font-medium">{totalPerformances}</p>
+          <h3 className="text-lg font-light mt-2">Total Performances</h3>
         </div>
-        <div className="flex flex-col items-center space-y-8">
-          <DotGraph performances={performances} />
-        </div>
+      </div>
+
+      <div className="flex flex-col items-center space-y-8">
+        <DotGraph performances={performances} />
       </div>
     </div>
   );
