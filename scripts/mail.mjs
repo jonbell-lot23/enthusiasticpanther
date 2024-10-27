@@ -34,8 +34,8 @@ async function calculateHistoricalQuality(songId) {
 
   // Apply the range only if the song has been played more than 5 times
   if (performances.length > 5) {
-    lowerBound = averageQuality - 10;
-    upperBound = averageQuality + 40;
+    lowerBound = averageQuality - 10; // Narrowed range
+    upperBound = averageQuality + 10; // Narrowed range
   }
 
   // Generate a random quality score within the range
@@ -111,8 +111,6 @@ async function getCity(nextCityQuery) {
 }
 
 async function createNewShow() {
-  const prisma = new PrismaClient();
-
   try {
     // Fetch past concerts
     const pastConcertsList = await getPastConcerts(prisma);
@@ -137,7 +135,7 @@ async function createNewShow() {
 
     // Insert the new show using the next city and date
     console.log(`Creating new show in: ${nextCity} on ${currentDate}`);
-    
+
     const result = await prisma.ep_shows.create({
       data: {
         id: newId,
@@ -145,15 +143,13 @@ async function createNewShow() {
         date: currentDate, // Add the date here
       },
     });
-    
+
     console.log(
       `Finished creating new show: ${result.location} on ${result.date}`
     );
     return result;
   } catch (err) {
     console.error(err);
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -219,7 +215,7 @@ async function getRandomSongs() {
 
     function calculateThrillFactor(gap) {
       if (gap <= 10) return 0;
-      return 6 * Math.log10(gap - 9);
+      return 3 * Math.log10(gap - 9); // Reduced impact
     }
 
     const shuffledSongs = oldSongs.sort(() => 0.5 - Math.random());
@@ -273,53 +269,48 @@ async function sendPlaylistByEmail(songs) {
 }
 
 async function main() {
-  const songs = await getRandomSongs();
-  let totalPerformanceScore = 0;
+  try {
+    const songs = await getRandomSongs();
+    let totalPerformanceScore = 0;
 
-  console.log("Playlist:");
-  songs.forEach((song) => {
+    console.log("Playlist:");
+    songs.forEach((song) => {
+      console.log(
+        `* ${song.name} | Avg: ${song.averageQuality} | Rand: ${song.randomQualityScore} | Gap: ${song.gap} | Thrill: ${song.thrillFactor} | Final score: ${song.historicalQuality}`
+      );
+
+      totalPerformanceScore += song.historicalQuality;
+    });
+
+    const averagePerformanceScore = songs.length
+      ? totalPerformanceScore / songs.length
+      : 0;
+    console.log(`\nAverage Performance Score: ${averagePerformanceScore}`);
+
+    const newShow = await createNewShow();
+    console.log(`New show created with ID: ${newShow.id}`);
+
+    await addSongsToPerformance(songs, newShow.id);
+    console.log("Songs added to performance successfully!");
+
+    // Update the quality of the new show with the calculated average performance score
+    await prisma.ep_shows.update({
+      where: { id: newShow.id },
+      data: { quality: averagePerformanceScore },
+    });
     console.log(
-      `* ${song.name} | Avg: ${song.averageQuality} | Rand: ${song.randomQualityScore} | Gap: ${song.gap} | Thrill: ${song.thrillFactor} | Final score: ${song.historicalQuality}`
+      `Quality score for show ID ${newShow.id} updated to ${averagePerformanceScore}`
     );
 
-    totalPerformanceScore += song.historicalQuality;
-  });
-
-  const averagePerformanceScore = songs.length
-    ? totalPerformanceScore / songs.length
-    : 0;
-  console.log(`\nAverage Performance Score: ${averagePerformanceScore}`);
-
-  const newShow = await createNewShow();
-  console.log(`New show created with ID: ${newShow.id}`);
-
-  await addSongsToPerformance(songs, newShow.id);
-  console.log("Songs added to performance successfully!");
-
-  // Update the quality of the new show with the calculated average performance score
-  await prisma.ep_shows.update({
-    where: { id: newShow.id },
-    data: { quality: averagePerformanceScore },
-  });
-  console.log(
-    `Quality score for show ID ${newShow.id} updated to ${averagePerformanceScore}`
-  );
-
-  
-  try {
     await sendPlaylistByEmail(songs);
     console.log("Playlist email sent successfully!");
   } catch (err) {
     console.error("An error occurred:", err);
-    process.exit(1);
+  } finally {
+    await prisma.$disconnect();
   }
-  
 }
 
-main()
-  .catch((e) => {
-    throw e;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch((e) => {
+  console.error("An error occurred in main:", e);
+});
