@@ -1,19 +1,23 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import prisma from "/prisma";
+import prisma from "@/prisma";
 
 export default function CityPage({
   cityName,
-  totalShows,
+  showDates,
   topSongs,
   cityImage,
+}: {
+  cityName: string;
+  showDates: Array<{ date: string; id: number }>;
+  topSongs: Array<{ id: number; name: string; playCount: number }>;
+  cityImage: string;
 }) {
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-bebas-neue">
-      <Link href="/">
-        <a className="text-white text-lg mb-4 inline-block">← Back</a>
-      </Link>
+      <Link href="/">← Back</Link>
       <main className="max-w-4xl mx-auto space-y-8">
         <header className="bg-black rounded-lg overflow-hidden mb-8">
           <img
@@ -30,10 +34,27 @@ export default function CityPage({
 
         <Card className="bg-gray-800 text-white border-black">
           <CardHeader>
-            <CardTitle className="text-2xl">Show Statistics</CardTitle>
+            <CardTitle className="text-2xl">Show Dates</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xl">Total Shows: {totalShows}</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {showDates.map((show) => (
+                <Link key={show.id} href={`/show/${show.id}`}>
+                  <a className="block">
+                    <div className="relative aspect-square">
+                      <Image
+                        src={`/show-art/show${show.id}.png`}
+                        alt={`Show on ${show.date}`}
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-lg"
+                      />
+                    </div>
+                    <p className="text-sm mt-2 text-center">{show.date}</p>
+                  </a>
+                </Link>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -43,11 +64,9 @@ export default function CityPage({
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {topSongs.map((song, index) => (
+              {topSongs.map((song) => (
                 <li key={song.id} className="flex justify-between items-center">
-                  <span className="text-xl">
-                    {index + 1}. {song.name}
-                  </span>
+                  <span className="text-xl">{song.name}</span>
                   <span className="text-lg text-gray-400">
                     {song.playCount} {song.playCount === 1 ? "time" : "times"}
                   </span>
@@ -61,10 +80,22 @@ export default function CityPage({
   );
 }
 
-export async function getServerSideProps(context) {
-  const cityName = context.params.city;
+export async function getStaticPaths() {
+  const cities = await prisma.ep_shows.findMany({
+    select: { location: true },
+    distinct: ["location"],
+  });
 
-  // Fetch shows by city name
+  const paths = cities.map((city) => ({
+    params: { city: city.location.toLowerCase().replace(/\s+/g, "-") },
+  }));
+
+  return { paths, fallback: "blocking" };
+}
+
+export async function getStaticProps({ params }) {
+  const cityName = params.city.replace(/-/g, " ");
+
   const shows = await prisma.ep_shows.findMany({
     where: {
       location: {
@@ -72,11 +103,20 @@ export async function getServerSideProps(context) {
         mode: "insensitive",
       },
     },
-    select: { id: true },
+    select: { id: true, date: true },
+    orderBy: { date: "desc" },
   });
 
+  const showDates = shows.map((show) => ({
+    id: show.id,
+    date: new Date(show.date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+  }));
+
   const showIds = shows.map((show) => show.id);
-  const totalShows = showIds.length;
 
   const songPerformances = await prisma.ep_songperformances.findMany({
     where: {
@@ -115,12 +155,10 @@ export async function getServerSideProps(context) {
       `https://api.unsplash.com/photos/random?query=${query}&client_id=r3F4wrZA6lUpBIXATEiLpZ0r2w89uDiG-GGARD62Wmg`
     );
 
-    // Check for successful response
     if (unsplashResponse.ok) {
       const unsplashData = await unsplashResponse.json();
       cityImage = unsplashData?.urls?.regular || "";
 
-      // Log data if image is missing
       if (!cityImage) {
         console.warn(`Image URL missing for city: ${cityName}`, unsplashData);
       }
@@ -138,9 +176,10 @@ export async function getServerSideProps(context) {
   return {
     props: {
       cityName,
-      totalShows,
+      showDates,
       topSongs,
       cityImage,
     },
+    revalidate: 3600, // Revalidate every hour
   };
 }
