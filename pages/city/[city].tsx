@@ -15,7 +15,7 @@ export default function CityPage({
   cityName,
   showDates,
   topSongs,
-  cityImage,
+  // Remove cityImage from the props as it's no longer needed
   // Add new props for statistics
   daysSinceLastShow,
   totalShows,
@@ -25,7 +25,6 @@ export default function CityPage({
   cityName: string;
   showDates: Array<{ date: string; id: number }>;
   topSongs: Array<{ id: number; name: string; playCount: number }>;
-  cityImage: string;
   daysSinceLastShow: number;
   totalShows: number;
   songsPerformed: number;
@@ -36,11 +35,6 @@ export default function CityPage({
       <Link href="/">← Back</Link>
       <main className="max-w-4xl mx-auto space-y-8">
         <header className="relative rounded-lg overflow-hidden mb-8">
-          <img
-            src={cityImage}
-            alt={`${cityName} image`}
-            className="w-full h-64 object-cover"
-          />
           <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full">
             <h1 className="text-4xl md:text-6xl font-bold tracking-wider text-white drop-shadow-lg mb-4">
               {cityName.toUpperCase()}
@@ -170,34 +164,6 @@ export async function getStaticProps({ params }) {
     }))
     .sort((a, b) => b.playCount - a.playCount || a.name.localeCompare(b.name));
 
-  // Fetch city image from Unsplash only for the most recent 50 shows
-  let cityImage = "";
-  if (shows.length <= 50) {
-    try {
-      const query = `${cityName} venue`.replace(/\s+/g, "+");
-      const unsplashResponse = await fetch(
-        `https://api.unsplash.com/photos/random?query=${query}&client_id=r3F4wrZA6lUpBIXATEiLpZ0r2w89uDiG-GGARD62Wmg`
-      );
-
-      if (unsplashResponse.ok) {
-        const unsplashData = await unsplashResponse.json();
-        cityImage = unsplashData?.urls?.regular || "";
-
-        if (!cityImage) {
-          console.warn(`Image URL missing for city: ${cityName}`, unsplashData);
-        }
-      } else {
-        console.error(
-          "Unsplash API Error:",
-          unsplashResponse.status,
-          unsplashResponse.statusText
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching Unsplash image:", error);
-    }
-  }
-
   // Calculate days since last show
   const mostRecentShowDate = new Date(shows[0].date);
   const daysSinceLastShow = daysBetween(mostRecentShowDate, new Date());
@@ -217,7 +183,6 @@ export async function getStaticProps({ params }) {
       cityName,
       showDates,
       topSongs,
-      cityImage,
       // Add new props for statistics
       daysSinceLastShow,
       totalShows,
