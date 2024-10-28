@@ -3,6 +3,7 @@ import { Chart as ChartJS, registerables } from "chart.js";
 import styles from "./Song.module.css";
 import prisma from "/prisma";
 import Link from "next/link";
+import RatingSVG from "../../components/RatingDot";
 
 ChartJS.register(...registerables);
 
@@ -79,33 +80,23 @@ function SongPage({ songDetails, performances }) {
 
 function DotGraph({ performances }) {
   return (
-    <div className="flex flex-wrap items-center max-w-full space-x-1 space-y-1">
+    <div className="flex flex-wrap items-center max-w-full gap-2">
       {performances.map((performance, index) => {
-        let fillClass = "bg-gray-500"; // Default for not played
         if (performance.played) {
-          switch (true) {
-            case performance.quality <= 25:
-              fillClass = "bg-blue-300 quarter-fill";
-              break;
-            case performance.quality <= 49:
-              fillClass = "bg-blue-300 half-fill";
-              break;
-            case performance.quality <= 74:
-              fillClass = "bg-blue-300 three-quarters-fill";
-              break;
-            default:
-              fillClass = "bg-blue-300 full-fill";
-          }
+          return (
+            <div key={index} title={`Quality: ${performance.quality}`}>
+              <RatingSVG rating={performance.quality} />
+            </div>
+          );
+        } else {
+          return (
+            <div
+              key={index}
+              className="w-[15px] h-[15px] rounded-full bg-gray-900"
+              title="N/A"
+            />
+          );
         }
-        return (
-          <div
-            key={index}
-            className={`w-3 h-3 rounded-full ${fillClass}`}
-            title={
-              performance.played ? `Quality: ${performance.quality}` : "N/A"
-            }
-          />
-        );
       })}
     </div>
   );

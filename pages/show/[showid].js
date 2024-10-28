@@ -100,10 +100,16 @@ export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
             />
           </div>
           <div className="relative p-4 md:p-6 w-full md:w-2/3 bg-transparent bg-opacity-90">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-wider mb-2">
-              {show.location.toUpperCase()}
+            <h1 className="text-4xl md:text-6xl font-bold tracking-wider mb-0">
+              <Link
+                href={`/city/${encodeURIComponent(
+                  show.location.toLowerCase()
+                )}`}
+              >
+                <a>{show.location.toUpperCase()}</a>
+              </Link>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-400">
+            <p className="text-xl md:text-2xl text-gray-100">
               {new Date(show.date)
                 .toLocaleDateString("en-US", {
                   year: "numeric",
@@ -113,7 +119,7 @@ export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
                 .toUpperCase()}
             </p>
             <Card className="bg-transparent border-none text-white m-0">
-              <div className="text-2xl space-y-2 pt-4">
+              <div className="text-2xl space-y-2 pt-4 hidden">
                 <p>Total Songs: {songs.length}</p>
                 <p>Average Score: {averageScore}</p>
                 <p>

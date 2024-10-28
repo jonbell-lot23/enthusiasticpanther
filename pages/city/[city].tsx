@@ -4,31 +4,54 @@ import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import prisma from "@/prisma";
 
+// Add this function to calculate days between dates
+function daysBetween(date1, date2) {
+  const ONE_DAY = 1000 * 60 * 60 * 24;
+  const differenceMs = Math.abs(date2 - date1);
+  return Math.round(differenceMs / ONE_DAY);
+}
+
 export default function CityPage({
   cityName,
   showDates,
   topSongs,
   cityImage,
+  // Add new props for statistics
+  daysSinceLastShow,
+  totalShows,
+  songsPerformed,
+  totalSongs,
 }: {
   cityName: string;
   showDates: Array<{ date: string; id: number }>;
   topSongs: Array<{ id: number; name: string; playCount: number }>;
   cityImage: string;
+  daysSinceLastShow: number;
+  totalShows: number;
+  songsPerformed: number;
+  totalSongs: number;
 }) {
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-bebas-neue">
       <Link href="/">← Back</Link>
       <main className="max-w-4xl mx-auto space-y-8">
-        <header className="bg-black rounded-lg overflow-hidden mb-8">
+        <header className="relative rounded-lg overflow-hidden mb-8">
           <img
             src={cityImage}
             alt={`${cityName} image`}
             className="w-full h-64 object-cover"
           />
-          <div className="p-4 md:p-6 bg-transparent bg-opacity-90">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-wider mb-2">
+          <div className="absolute inset-0 flex flex-col items-center justify-center w-full h-full">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-wider text-white drop-shadow-lg mb-4">
               {cityName.toUpperCase()}
             </h1>
+            <div className="flex space-x-4 text-xl text-white">
+              <div>DAYS SINCE LAST SHOW: {daysSinceLastShow}</div>
+              <div>TOTAL SHOWS: {totalShows}</div>
+              <div>
+                SONGS PERFORMED: {songsPerformed}/{totalSongs}
+              </div>
+            </div>
           </div>
         </header>
 
@@ -150,7 +173,7 @@ export async function getStaticProps({ params }) {
   // Fetch city image from Unsplash
   let cityImage = "";
   try {
-    const query = `${cityName} city skyline`.replace(/\s+/g, "+");
+    const query = `${cityName} venue`.replace(/\s+/g, "+");
     const unsplashResponse = await fetch(
       `https://api.unsplash.com/photos/random?query=${query}&client_id=r3F4wrZA6lUpBIXATEiLpZ0r2w89uDiG-GGARD62Wmg`
     );
@@ -173,12 +196,31 @@ export async function getStaticProps({ params }) {
     console.error("Error fetching Unsplash image:", error);
   }
 
+  // Calculate days since last show
+  const mostRecentShowDate = new Date(shows[0].date);
+  const daysSinceLastShow = daysBetween(mostRecentShowDate, new Date());
+
+  // Count total shows
+  const totalShows = shows.length;
+
+  // Fetch total number of songs
+  const totalSongsResponse = await prisma.ep_songs.count();
+  const totalSongs = totalSongsResponse;
+
+  // Count songs performed
+  const songsPerformed = Object.keys(songCounts).length;
+
   return {
     props: {
       cityName,
       showDates,
       topSongs,
       cityImage,
+      // Add new props for statistics
+      daysSinceLastShow,
+      totalShows,
+      songsPerformed,
+      totalSongs,
     },
     revalidate: 3600, // Revalidate every hour
   };
