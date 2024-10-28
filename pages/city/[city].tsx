@@ -170,30 +170,32 @@ export async function getStaticProps({ params }) {
     }))
     .sort((a, b) => b.playCount - a.playCount || a.name.localeCompare(b.name));
 
-  // Fetch city image from Unsplash
+  // Fetch city image from Unsplash only for the most recent 50 shows
   let cityImage = "";
-  try {
-    const query = `${cityName} venue`.replace(/\s+/g, "+");
-    const unsplashResponse = await fetch(
-      `https://api.unsplash.com/photos/random?query=${query}&client_id=r3F4wrZA6lUpBIXATEiLpZ0r2w89uDiG-GGARD62Wmg`
-    );
-
-    if (unsplashResponse.ok) {
-      const unsplashData = await unsplashResponse.json();
-      cityImage = unsplashData?.urls?.regular || "";
-
-      if (!cityImage) {
-        console.warn(`Image URL missing for city: ${cityName}`, unsplashData);
-      }
-    } else {
-      console.error(
-        "Unsplash API Error:",
-        unsplashResponse.status,
-        unsplashResponse.statusText
+  if (shows.length <= 50) {
+    try {
+      const query = `${cityName} venue`.replace(/\s+/g, "+");
+      const unsplashResponse = await fetch(
+        `https://api.unsplash.com/photos/random?query=${query}&client_id=r3F4wrZA6lUpBIXATEiLpZ0r2w89uDiG-GGARD62Wmg`
       );
+
+      if (unsplashResponse.ok) {
+        const unsplashData = await unsplashResponse.json();
+        cityImage = unsplashData?.urls?.regular || "";
+
+        if (!cityImage) {
+          console.warn(`Image URL missing for city: ${cityName}`, unsplashData);
+        }
+      } else {
+        console.error(
+          "Unsplash API Error:",
+          unsplashResponse.status,
+          unsplashResponse.statusText
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching Unsplash image:", error);
     }
-  } catch (error) {
-    console.error("Error fetching Unsplash image:", error);
   }
 
   // Calculate days since last show
