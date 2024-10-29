@@ -1,10 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import prisma from "../prisma";
-import NodeCache from "node-cache";
 import { BandLayout } from "../components/HomeRedesignOctober2024";
-
-const cache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour
 
 export default function HelloWorldPage({
   latestShows,
@@ -31,29 +28,17 @@ export default function HelloWorldPage({
   );
 }
 
-export async function getServerSideProps() {
-  // Fetch latest shows and top 20 shows by quality if not cached
+export async function getStaticProps() {
+  // Fetch latest shows and top 20 shows by quality
   const [latestShows, top20Shows] = await Promise.all([
-    cache.get("latestShows") ||
-      prisma.ep_shows
-        .findMany({
-          orderBy: { id: "desc" },
-          take: 10,
-        })
-        .then((shows) => {
-          cache.set("latestShows", shows);
-          return shows;
-        }),
-    cache.get("top20Shows") ||
-      prisma.ep_shows
-        .findMany({
-          orderBy: { quality: "desc" },
-          take: 20,
-        })
-        .then((shows) => {
-          cache.set("top20Shows", shows);
-          return shows;
-        }),
+    prisma.ep_shows.findMany({
+      orderBy: { id: "desc" },
+      take: 10,
+    }),
+    prisma.ep_shows.findMany({
+      orderBy: { quality: "desc" },
+      take: 20,
+    }),
   ]);
 
   // Shuffle the top 20 shows and take the first 9
@@ -103,5 +88,6 @@ export async function getServerSideProps() {
       highlyRatedShows,
       latestSetlist,
     },
+    revalidate: 3600, // Revalidate every hour
   };
 }
