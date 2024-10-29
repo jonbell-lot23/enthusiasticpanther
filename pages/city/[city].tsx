@@ -103,20 +103,7 @@ export default function CityPage({
   );
 }
 
-export async function getStaticPaths() {
-  const cities = await prisma.ep_shows.findMany({
-    select: { location: true },
-    distinct: ["location"],
-  });
-
-  const paths = cities.map((city) => ({
-    params: { city: city.location.toLowerCase().replace(/\s+/g, "-") },
-  }));
-
-  return { paths, fallback: "blocking" };
-}
-
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params }) {
   const cityName = params.city.replace(/-/g, " ");
 
   const shows = await prisma.ep_shows.findMany({
@@ -222,6 +209,5 @@ export async function getStaticProps({ params }) {
       songsPerformed,
       totalSongs,
     },
-    revalidate: 3600, // Revalidate every hour
   };
 }
