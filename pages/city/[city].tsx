@@ -1,154 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "components/ui/card";
-import prisma from "prisma";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import prisma from "@/prisma";
 
 // Add this function to calculate days between dates
 function daysBetween(date1, date2) {
-  const ONE_DAY = 1001 * 60 * 60 * 24;
+  const ONE_DAY = 1000 * 60 * 60 * 24;
   const differenceMs = Math.abs(date2 - date1);
   return Math.round(differenceMs / ONE_DAY);
 }
 
-export default function CityPage({ params }) {
-  const [cityData, setCityData] = useState({
-    cityName: "",
-    showDates: [],
-    topSongs: [],
-    cityImage: "",
-    daysSinceLastShow: 0,
-    totalShows: 0,
-    songsPerformed: 0,
-    totalSongs: 0,
-  });
-
-  useEffect(() => {
-    async function fetchData() {
-      const cityName = params.city.replace(/-/g, " ");
-
-      const shows = await prisma.ep_shows.findMany({
-        where: {
-          location: {
-            contains: cityName,
-            mode: "insensitive",
-          },
-        },
-        select: { id: true, date: true },
-        orderBy: { date: "desc" },
-      });
-
-      const showDates = shows.map((show) => ({
-        id: show.id,
-        date: new Date(show.date).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }),
-      }));
-
-      const showIds = shows.map((show) => show.id);
-
-      const songPerformances = await prisma.ep_songperformances.findMany({
-        where: {
-          showid: { in: showIds },
-        },
-        select: {
-          songid: true,
-        },
-      });
-
-      const songCounts = songPerformances.reduce((acc, performance) => {
-        acc[performance.songid] = (acc[performance.songid] || 0) + 1;
-        return acc;
-      }, {});
-
-      const songDetails = await prisma.ep_songs.findMany({
-        where: {
-          id: { in: Object.keys(songCounts).map(Number) },
-        },
-        select: { id: true, name: true },
-      });
-
-      const topSongs = songDetails
-        .map((song) => ({
-          id: song.id,
-          name: song.name,
-          playCount: songCounts[song.id] || 0,
-        }))
-        .sort(
-          (a, b) => b.playCount - a.playCount || a.name.localeCompare(b.name)
-        );
-
-      // Fetch city image from Unsplash
-      let cityImage = "";
-      try {
-        const query = `${cityName} venue`.replace(/\s+/g, "+");
-        const unsplashResponse = await fetch(
-          `https://api.unsplash.com/photos/random?query=${query}&client_id=r3F4wrZA6lUpBIXATEiLpZ0r2w89uDiG-GGARD62Wmg`
-        );
-
-        if (unsplashResponse.ok) {
-          const unsplashData = await unsplashResponse.json();
-          cityImage = unsplashData?.urls?.regular || "";
-
-          if (!cityImage) {
-            console.warn(
-              `Image URL missing for city: ${cityName}`,
-              unsplashData
-            );
-          }
-        } else {
-          console.error(
-            "Unsplash API Error:",
-            unsplashResponse.status,
-            unsplashResponse.statusText
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching Unsplash image:", error);
-      }
-
-      // Calculate days since last show
-      const mostRecentShowDate = new Date(shows[0].date);
-      const daysSinceLastShow = daysBetween(mostRecentShowDate, new Date());
-
-      // Count total shows
-      const totalShows = shows.length;
-
-      // Fetch total number of songs
-      const totalSongsResponse = await prisma.ep_songs.count();
-      const totalSongs = totalSongsResponse;
-
-      // Count songs performed
-      const songsPerformed = Object.keys(songCounts).length;
-
-      setCityData({
-        cityName,
-        showDates,
-        topSongs,
-        cityImage,
-        daysSinceLastShow,
-        totalShows,
-        songsPerformed,
-        totalSongs,
-      });
-    }
-
-    fetchData();
-  }, [params.city]);
-
-  const {
-    cityName,
-    showDates,
-    topSongs,
-    cityImage,
-    daysSinceLastShow,
-    totalShows,
-    songsPerformed,
-    totalSongs,
-  } = cityData;
-
+export default function CityPage({
+  cityName,
+  showDates,
+  topSongs,
+  cityImage,
+  // Add new props for statistics
+  daysSinceLastShow,
+  totalShows,
+  songsPerformed,
+  totalSongs,
+}: {
+  cityName: string;
+  showDates: Array<{ date: string; id: number }>;
+  topSongs: Array<{ id: number; name: string; playCount: number }>;
+  cityImage: string;
+  daysSinceLastShow: number;
+  totalShows: number;
+  songsPerformed: number;
+  totalSongs: number;
+}) {
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-bebas-neue">
       <Link href="/">← Back</Link>
@@ -219,4 +101,127 @@ export default function CityPage({ params }) {
       </main>
     </div>
   );
+}
+
+export async function getStaticPaths() {
+  const cities = await prisma.ep_shows.findMany({
+    select: { location: true },
+    distinct: ["location"],
+  });
+
+  const paths = cities.map((city) => ({
+    params: { city: city.location.toLowerCase().replace(/\s+/g, "-") },
+  }));
+
+  return { paths, fallback: "blocking" };
+}
+
+export async function getStaticProps({ params }) {
+  const cityName = params.city.replace(/-/g, " ");
+
+  const shows = await prisma.ep_shows.findMany({
+    where: {
+      location: {
+        contains: cityName,
+        mode: "insensitive",
+      },
+    },
+    select: { id: true, date: true },
+    orderBy: { date: "desc" },
+  });
+
+  const showDates = shows.map((show) => ({
+    id: show.id,
+    date: new Date(show.date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+  }));
+
+  const showIds = shows.map((show) => show.id);
+
+  const songPerformances = await prisma.ep_songperformances.findMany({
+    where: {
+      showid: { in: showIds },
+    },
+    select: {
+      songid: true,
+    },
+  });
+
+  const songCounts = songPerformances.reduce((acc, performance) => {
+    acc[performance.songid] = (acc[performance.songid] || 0) + 1;
+    return acc;
+  }, {});
+
+  const songDetails = await prisma.ep_songs.findMany({
+    where: {
+      id: { in: Object.keys(songCounts).map(Number) },
+    },
+    select: { id: true, name: true },
+  });
+
+  const topSongs = songDetails
+    .map((song) => ({
+      id: song.id,
+      name: song.name,
+      playCount: songCounts[song.id] || 0,
+    }))
+    .sort((a, b) => b.playCount - a.playCount || a.name.localeCompare(b.name));
+
+  // Fetch city image from Unsplash
+  let cityImage = "";
+  try {
+    const query = `${cityName} venue`.replace(/\s+/g, "+");
+    const unsplashResponse = await fetch(
+      `https://api.unsplash.com/photos/random?query=${query}&client_id=r3F4wrZA6lUpBIXATEiLpZ0r2w89uDiG-GGARD62Wmg`
+    );
+
+    if (unsplashResponse.ok) {
+      const unsplashData = await unsplashResponse.json();
+      cityImage = unsplashData?.urls?.regular || "";
+
+      if (!cityImage) {
+        console.warn(`Image URL missing for city: ${cityName}`, unsplashData);
+      }
+    } else {
+      console.error(
+        "Unsplash API Error:",
+        unsplashResponse.status,
+        unsplashResponse.statusText
+      );
+    }
+  } catch (error) {
+    console.error("Error fetching Unsplash image:", error);
+  }
+
+  // Calculate days since last show
+  const mostRecentShowDate = new Date(shows[0].date);
+  const daysSinceLastShow = daysBetween(mostRecentShowDate, new Date());
+
+  // Count total shows
+  const totalShows = shows.length;
+
+  // Fetch total number of songs
+  const totalSongsResponse = await prisma.ep_songs.count();
+  const totalSongs = totalSongsResponse;
+
+  // Count songs performed
+  const songsPerformed = Object.keys(songCounts).length;
+
+  return {
+    props: {
+      cityName,
+      showDates,
+      topSongs,
+      cityImage,
+      // Add new props for statistics
+      daysSinceLastShow,
+      totalShows,
+      songsPerformed,
+      totalSongs,
+    },
+    revalidate: 3600, // Revalidate every hour
+  };
 }
