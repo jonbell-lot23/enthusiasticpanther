@@ -14,7 +14,7 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore, date }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (showId <= 255) {
+    if (showId <= 258) {
       return;
     }
 
@@ -139,7 +139,9 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore, date }) {
             }}
           >
             <span style={{ textAlign: "left" }}>{city}</span>
-            <span style={{ textAlign: "right", fontSize: "0.75rem" }}>{date}</span>
+            <span style={{ textAlign: "right", fontSize: "0.75rem" }}>
+              {date}
+            </span>
           </div>
           {showId <= 335 ? (
             <img

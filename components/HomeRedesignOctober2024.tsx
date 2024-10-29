@@ -18,28 +18,33 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
   };
 
   // Inline component for show formatting
-  const ShowCard = ({ show }) => (
-    <Link href={show.link} key={show.id}>
-      <a className="overflow-hidden mx-2 md:mx-0 cursor-pointer">
-        <Image
-          src={`/show-art/show${show.id}.png`}
-          alt={`${show.location} show`}
-          layout="responsive"
-          width={400}
-          height={400}
-          className="w-full h-48 object-cover rounded-lg"
-        />
-        <div className="p-4 text-center">
-          <span className="text-2xl md:text-lg mr-3 font-medium text-white">
-            {show.location.split(",")[0].toUpperCase()}
-          </span>
-          <span className="text-2xl md:text-lg text-gray-400">
-            {formatDate(show.date).toUpperCase()}
-          </span>
-        </div>
-      </a>
-    </Link>
-  );
+  const ShowCard = ({ show }) => {
+    const city = show.location.split(",")[0].toLowerCase();
+    return (
+      <Link href={show.link} key={show.id}>
+        <a className="overflow-hidden mx-2 md:mx-0 cursor-pointer">
+          <Image
+            src={`/show-art/show${show.id}.png`}
+            alt={`${show.location} show`}
+            layout="responsive"
+            width={400}
+            height={400}
+            className="w-full h-48 object-cover rounded-lg"
+          />
+          <div className="p-4 text-center">
+            <Link href={`/city/${city}`}>
+              <a className="text-2xl md:text-lg mr-3 font-medium text-white">
+                {city.toUpperCase()}
+              </a>
+            </Link>
+            <span className="text-2xl md:text-lg text-gray-400">
+              {formatDate(show.date).toUpperCase()}
+            </span>
+          </div>
+        </a>
+      </Link>
+    );
+  };
 
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-bebas-neue">
