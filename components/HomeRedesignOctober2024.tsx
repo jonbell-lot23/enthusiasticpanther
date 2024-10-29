@@ -86,11 +86,19 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
           </div>
           <div className="relative p-4 md:p-6 w-full md:w-1/2 bg-transparent bg-opacity-90">
             <p className="text-xl md:text-2xl mb-4">
-              {firstShow.location.toUpperCase()}
+              <Link
+                href={`/city/${firstShow.location.split(",")[0].toLowerCase()}`}
+              >
+                <a>{firstShow.location.toUpperCase()}</a>
+              </Link>
               <br />
               {firstShow.date}
             </p>
-            <h3 className="text-xl md:text-2xl font-bold mb-2">SETLIST</h3>
+            <h3 className="text-xl md:text-2xl font-bold mb-2">
+              <Link href={firstShow.link}>
+                <a>SETLIST</a>
+              </Link>
+            </h3>
             <div className="text-2xl md:text-md">
               {latestSetlist.map((song, index) => (
                 <React.Fragment key={index}>
