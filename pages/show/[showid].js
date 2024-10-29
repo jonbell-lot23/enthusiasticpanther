@@ -174,22 +174,7 @@ export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
   );
 }
 
-export async function getStaticPaths() {
-  const shows = await prisma.ep_shows.findMany({
-    select: { id: true },
-  });
-
-  const paths = shows.map((show) => ({
-    params: { showid: show.id.toString() },
-  }));
-
-  return {
-    paths,
-    fallback: "blocking",
-  };
-}
-
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params }) {
   const showId = Number(params.showid);
 
   if (isNaN(showId)) {
@@ -260,6 +245,5 @@ export async function getStaticProps({ params }) {
       prevShowId,
       nextShowId,
     },
-    revalidate: 600,
   };
 }
