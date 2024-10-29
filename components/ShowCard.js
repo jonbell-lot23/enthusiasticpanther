@@ -143,7 +143,7 @@ function ShowCard({ showId, location, imageSize = "h-full", showScore, date }) {
               {date}
             </span>
           </div>
-          {showId <= 335 ? (
+          {showId <= 338 ? (
             <img
               src={`/show-art/show${showId}.png`}
               alt={location}
