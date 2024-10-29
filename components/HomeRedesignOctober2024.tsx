@@ -33,11 +33,11 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
           />
           <div className="p-4 text-center">
             <Link href={`/city/${city}`}>
-              <a className="text-2xl md:text-lg mr-3 font-medium text-white">
+              <a className="text-2xl md:text-lg mr-3 font-medium text-white hover:text-yellow-500">
                 {city.toUpperCase()}
               </a>
             </Link>
-            <span className="text-2xl md:text-lg text-gray-400">
+            <span className="text-2xl md:text-lg text-gray-400 hover:text-yellow-500">
               {formatDate(show.date).toUpperCase()}
             </span>
           </div>
@@ -89,21 +89,25 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
               <Link
                 href={`/city/${firstShow.location.split(",")[0].toLowerCase()}`}
               >
-                <a>{firstShow.location.toUpperCase()}</a>
+                <a className="text-5xl hover:text-yellow-500">
+                  {firstShow.location.toUpperCase()}
+                </a>
               </Link>
               <br />
-              {firstShow.date}
+              <Link href={`/show/${firstShow.id}`}>
+                <a className="hover:text-yellow-500">{firstShow.date}</a>
+              </Link>
             </p>
             <h3 className="text-xl md:text-2xl font-bold mb-2">
               <Link href={firstShow.link}>
-                <a>SETLIST</a>
+                <a className="hover:text-yellow-500">SETLIST</a>
               </Link>
             </h3>
             <div className="text-2xl md:text-md">
               {latestSetlist.map((song, index) => (
                 <React.Fragment key={index}>
                   <Link href={`/song/${song.id}`}>
-                    <a>
+                    <a className="hover:text-yellow-500">
                       {song.name.toUpperCase()}{" "}
                       {song.isDebut && <sup>DEBUT</sup>}
                     </a>

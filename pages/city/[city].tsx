@@ -33,7 +33,9 @@ export default function CityPage({
 }) {
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-bebas-neue">
-      <Link href="/">← Back</Link>
+      <Link href="/">
+        <a className="hover:text-yellow-500">← Back</a>
+      </Link>
       <main className="max-w-4xl mx-auto space-y-8">
         <header className="relative rounded-lg overflow-hidden mb-8">
           <img
@@ -63,7 +65,7 @@ export default function CityPage({
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {showDates.map((show) => (
                 <Link key={show.id} href={`/show/${show.id}`}>
-                  <a className="block">
+                  <a className="block hover:text-yellow-500">
                     <div className="relative aspect-square">
                       <Image
                         src={`/show-art/show${show.id}.png`}
@@ -89,7 +91,9 @@ export default function CityPage({
             <ul className="space-y-2">
               {topSongs.map((song) => (
                 <li key={song.id} className="flex justify-between items-center">
-                  <span className="text-xl">{song.name}</span>
+                  <span className="text-xl hover:text-yellow-500 cursor-pointer">
+                    {song.name}
+                  </span>
                   <span className="text-lg text-gray-400">
                     {song.playCount} {song.playCount === 1 ? "time" : "times"}
                   </span>

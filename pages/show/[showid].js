@@ -79,7 +79,9 @@ export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8 font-bebas-neue">
       <Link href="/">
-        <a className="text-white text-lg mb-4 inline-block">← Back</a>
+        <a className="text-white text-lg mb-4 inline-block hover:text-yellow-500">
+          ← Back
+        </a>
       </Link>
       <main className="max-w-4xl mx-auto space-y-8">
         <header className="relative bg-black rounded-lg overflow-hidden mb-8 flex flex-col md:flex-row">
@@ -106,7 +108,9 @@ export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
                   show.location.toLowerCase()
                 )}`}
               >
-                <a>{show.location.toUpperCase()}</a>
+                <a className="hover:text-yellow-500">
+                  {show.location.toUpperCase()}
+                </a>
               </Link>
             </h1>
             <p className="text-xl md:text-2xl text-gray-100">
@@ -135,7 +139,9 @@ export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
           <Link href={`/show/${prevShowId}`}>
             <a
               className={`text-lg ${
-                prevShowId ? "text-white" : "text-gray-500 pointer-events-none"
+                prevShowId
+                  ? "text-white hover:text-yellow-500"
+                  : "text-gray-500 pointer-events-none"
               }`}
             >
               ← Previous Show
@@ -144,7 +150,9 @@ export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
           <Link href={`/show/${nextShowId}`}>
             <a
               className={`text-lg ${
-                nextShowId ? "text-white" : "text-gray-500 pointer-events-none"
+                nextShowId
+                  ? "text-white hover:text-yellow-500"
+                  : "text-gray-500 pointer-events-none"
               }`}
             >
               Next Show →
@@ -163,7 +171,7 @@ export default function SetlistPage({ show, songs, prevShowId, nextShowId }) {
               </div>
               <div className="w-1/2 text-xl">
                 <Link href={`/song/${song.id}`}>
-                  <a>{song.name}</a>
+                  <a className="hover:text-yellow-500">{song.name}</a>
                 </Link>
               </div>
             </div>
