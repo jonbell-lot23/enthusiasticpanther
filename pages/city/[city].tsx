@@ -6,7 +6,7 @@ import prisma from "prisma";
 
 // Add this function to calculate days between dates
 function daysBetween(date1, date2) {
-  const ONE_DAY = 1000 * 60 * 60 * 24;
+  const ONE_DAY = 1001 * 60 * 60 * 24;
   const differenceMs = Math.abs(date2 - date1);
   return Math.round(differenceMs / ONE_DAY);
 }
