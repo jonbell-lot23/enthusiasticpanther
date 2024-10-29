@@ -22,15 +22,17 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
     const city = show.location.split(",")[0].toLowerCase();
     return (
       <Link href={show.link} key={show.id}>
-        <a className="overflow-hidden mx-2 md:mx-0 cursor-pointer">
-          <Image
-            src={`/show-art/show${show.id}.png`}
-            alt={`${show.location} show`}
-            layout="responsive"
-            width={400}
-            height={400}
-            className="w-full h-48 object-cover rounded-lg"
-          />
+        <a className="overflow-hidden mx-2 md:mx-0 cursor-pointer group">
+          <div className="relative">
+            <Image
+              src={`/show-art/show${show.id}.png`}
+              alt={`${show.location} show`}
+              layout="responsive"
+              width={400}
+              height={400}
+              className="w-full h-48 object-cover rounded-lg transition-transform duration-300 ease-in-out group-hover:scale-105"
+            />
+          </div>
           <div className="p-4 text-center">
             <Link href={`/city/${city}`}>
               <a className="text-2xl md:text-lg mr-3 font-medium text-white hover:text-yellow-500">
@@ -61,10 +63,10 @@ export function BandLayout({ latestShows, highlyRatedShows, latestSetlist }) {
         <h2 className="text-lg md:text-xl font-bold mb-4">LATEST SHOW</h2>
 
         {/* Latest show section */}
-        <section className="relative bg-black rounded-lg overflow-hidden mb-8 flex flex-col md:flex-row">
+        <section className="relative bg-black rounded-lg overflow-hidden mb-8 flex flex-col md:flex-row group">
           {/* Background with image */}
           <div
-            className="absolute inset-0 bg-cover bg-center filter brightness-50 blur-xl scale-110"
+            className="absolute inset-0 bg-cover bg-center filter brightness-50 blur-xl scale-110 transition-transform duration-300 ease-in-out group-hover:scale-125"
             style={{
               backgroundImage: `url('/show-art/show${firstShow.id}.png')`,
             }}
