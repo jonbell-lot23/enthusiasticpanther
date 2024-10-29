@@ -1,8 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import prisma from "@/prisma";
+import { Card, CardContent, CardHeader, CardTitle } from "components/ui/card";
+import prisma from "../../prisma"; // Corrected import path for prisma
 
 // Add this function to calculate days between dates
 function daysBetween(date1, date2) {
