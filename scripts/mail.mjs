@@ -74,7 +74,7 @@ async function getPastConcerts(prisma) {
 
 async function getCity(nextCityQuery) {
   const instructions =
-    "You are an assistant tasked with selecting the next city for the band's tour. Choose a city that is geographically close to the last visited city in the provided list. Avoid returning to a country immediately after leaving it. Aim to create a logical, straight path between cities, avoiding unnecessary detours. Do not suggest cities on different continents or those that are extremely distant. Provide your suggestion in the format: <City>, <Country>. Only respond with the city and country in this format, without additional commentary.";
+    "You are an assistant tasked with selecting the next city for the band's tour. Choose a city that is geographically close to the last visited city in the provided list. Avoid returning to a country immediately after leaving it. Aim to create a logical, straight path between cities, avoiding unnecessary detours. Do not suggest cities on different continents or those that are extremely distant. When the most recent show was a large city, consider or second or even third show in the same city. The band is from New Zealand, so when it's in new Zealand, there are more shows and even in less common areas, although they're less likely to have repeats if they're super small. Provide your suggestion in the format: <City>, <Country>. Only respond with the city and country in this format, without additional commentary.";
 
   const requestBody = {
     model: "gpt-4-turbo",
